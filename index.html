@@ -7,11 +7,32 @@
 <meta name="description" content="Archivo digital de proyectos de DHG.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 
 /* ============================================================
-   0. TOKENS
+   0. TIPOGRAFÍA — HELVETICA NEUE (self-hosted en /fonts)
+   Suba la carpeta "fonts" junto a este index.html a su repositorio.
+   ============================================================ */
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-UltraLight.otf') format('opentype'); font-weight:100; font-style:normal; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-UltraLightItalic.otf') format('opentype'); font-weight:100; font-style:italic; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-Thin.otf') format('opentype'); font-weight:200; font-style:normal; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-ThinItalic.otf') format('opentype'); font-weight:200; font-style:italic; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-Light.otf') format('opentype'); font-weight:300; font-style:normal; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-LightItalic.otf') format('opentype'); font-weight:300; font-style:italic; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-Roman.otf') format('opentype'); font-weight:400; font-style:normal; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-Italic.ttf') format('truetype'); font-weight:400; font-style:italic; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-Medium.otf') format('opentype'); font-weight:500; font-style:normal; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-MediumItalic.otf') format('opentype'); font-weight:500; font-style:italic; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-Bold.otf') format('opentype'); font-weight:700; font-style:normal; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-BoldItalic.otf') format('opentype'); font-weight:700; font-style:italic; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-Heavy.otf') format('opentype'); font-weight:800; font-style:normal; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-HeavyItalic.otf') format('opentype'); font-weight:800; font-style:italic; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-Black.otf') format('opentype'); font-weight:900; font-style:normal; font-display:swap; }
+@font-face{ font-family:'Helvetica Neue'; src:url('fonts/HelveticaNeue-BlackItalic.otf') format('opentype'); font-weight:900; font-style:italic; font-display:swap; }
+
+/* ============================================================
+   1. TOKENS
    ============================================================ */
 :root{
   --c-bg:#ffffff;
@@ -23,7 +44,7 @@
   --c-border-strong: rgba(20,20,20,.5);
   --c-grid: rgba(20,20,20,.045);
 
-  --font-display:'Space Grotesk', sans-serif;
+  --font-display:'Helvetica Neue', 'Helvetica', Arial, sans-serif;
   --font-mono:'IBM Plex Mono', monospace;
 
   --dur-btn:.25s;
@@ -109,7 +130,10 @@ button{ font-family:inherit; }
   text-transform:uppercase;
   color:var(--c-fg-soft);
   min-height:1em;
+  opacity:1;
+  transition:opacity .25s var(--ease-std);
 }
+.loader-status.fading{ opacity:0; }
 
 /* shared brand logo — moves from loader center to topbar dock */
 .brand-logo{
@@ -118,11 +142,16 @@ button{ font-family:inherit; }
   width:210px;
   transform:translate(-50%,-50%) scale(1);
   z-index:10000;
+  opacity:0;
+  animation:logoIntro .9s var(--ease-std) .15s both;
   transition:
     transform var(--dur-logo) var(--ease-std),
     top var(--dur-logo) var(--ease-std),
     width var(--dur-logo) var(--ease-std);
-  filter:drop-shadow(0 0 0 transparent);
+}
+@keyframes logoIntro{
+  from{ opacity:0; transform:translate(-50%,-50%) scale(.8); }
+  to{ opacity:1; transform:translate(-50%,-50%) scale(1); }
 }
 .brand-logo svg{ display:block; width:100%; height:auto; }
 .brand-logo .logo-negative{ display:none; }
@@ -166,7 +195,8 @@ button{ font-family:inherit; }
   top:var(--topbar-h); left:0; right:0;
   height:var(--statusbar-h);
   z-index:490;
-  display:flex; align-items:center;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px;
   padding:0 clamp(16px, 4vw, 40px);
   background:var(--c-bg-soft);
   border-bottom:1px solid var(--c-border);
@@ -221,23 +251,19 @@ button{ font-family:inherit; }
    4. THEME TOGGLE
    ============================================================ */
 .theme-toggle{
-  position:fixed;
-  left:22px; bottom:22px;
-  z-index:480;
+  flex-shrink:0;
   font-family:var(--font-mono);
-  font-size:.64rem;
+  font-size:.66rem;
   letter-spacing:.12em;
   text-transform:uppercase;
   color:var(--c-fg);
-  background:var(--c-bg);
+  background:transparent;
   border:1px solid var(--c-border-strong);
   border-radius:999px;
-  padding:9px 16px;
+  padding:5px 13px;
   cursor:pointer;
-  transition:background var(--dur-btn) var(--ease-std), color var(--dur-btn) var(--ease-std), opacity .6s var(--ease-std) .2s;
-  opacity:0;
+  transition:background var(--dur-btn) var(--ease-std), color var(--dur-btn) var(--ease-std);
 }
-.theme-toggle.visible{ opacity:1; }
 @media (hover:hover) and (pointer:fine){
   .theme-toggle:hover{ background:var(--c-fg); color:var(--c-bg); }
 }
@@ -268,7 +294,6 @@ main{ position:relative; z-index:1; }
   font-family:var(--font-mono);
   font-size:.7rem;
   letter-spacing:.18em;
-  text-transform:uppercase;
   color:var(--c-fg-soft);
   margin:0 0 18px;
 }
@@ -557,6 +582,12 @@ main{ position:relative; z-index:1; }
 @media (max-width: 860px){
   .proyecto-grid{ grid-template-columns:1fr; }
   .proyecto-meta{ grid-template-columns:repeat(3, 1fr); }
+  #proyectosDetalle .track-section{
+    min-height:auto;
+    padding-top:calc(var(--topbar-h) + var(--statusbar-h) + 40px);
+    padding-bottom:64px;
+  }
+  .btn-abrir{ margin-top:6px; }
 }
 
 /* transición entre proyectos */
@@ -592,10 +623,14 @@ main{ position:relative; z-index:1; }
 }
 
 .contacto-band{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  z-index:470;
   border-top:1px solid var(--c-border);
-  padding:26px clamp(20px, 5vw, 56px);
+  background:var(--c-bg);
+  padding:22px clamp(20px, 5vw, 56px);
   display:flex; align-items:center; justify-content:center;
-  scroll-snap-align:start;
+  transition:background var(--dur-theme) var(--ease-std), border-color var(--dur-theme) var(--ease-std);
 }
 .contacto-band a{
   font-family:var(--font-mono);
@@ -609,16 +644,35 @@ main{ position:relative; z-index:1; }
 @media (hover:hover) and (pointer:fine){
   .contacto-band a:hover{ opacity:.55; }
 }
+#contacto{
+  padding-bottom:var(--contactband-h, 82px);
+}
 
 /* ============================================================
-   10. REDUCED MOTION
+   10. REVEAL ON SCROLL
+   ============================================================ */
+.reveal{
+  opacity:0;
+  transform:translateY(22px);
+  transition:opacity var(--dur-scroll) var(--ease-std), transform var(--dur-scroll) var(--ease-std);
+}
+.reveal.in-view{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ============================================================
+   11. REDUCED MOTION
    ============================================================ */
 @media (prefers-reduced-motion: reduce){
   html{ scroll-behavior:auto; }
   .brand-logo, .loader, .topbar, .statusbar, .indicator, .theme-toggle,
-  .carousel-card, .btn, .btn-arrow, .carousel-card-overlay, .carousel-arrow{
+  .carousel-card, .btn, .btn-arrow, .carousel-card-overlay, .carousel-arrow,
+  .reveal, .loader-status{
     transition-duration:.01ms !important;
+    animation-duration:.01ms !important;
   }
+  .reveal{ opacity:1; transform:none; }
 }
 </style>
 </head>
@@ -776,11 +830,10 @@ main{ position:relative; z-index:1; }
 
 <div class="statusbar" id="statusbar">
   <p class="statusbar-label" id="statusbarLabel">SECCIÓN 01 / PRESENTACIÓN</p>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Modo oscuro</button>
 </div>
 
 <nav class="indicator" id="indicator" aria-label="Progreso de navegación"></nav>
-
-<button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Modo oscuro</button>
 
 <!-- ============================================================
      MAIN
@@ -790,14 +843,14 @@ main{ position:relative; z-index:1; }
   <!-- PRESENTACIÓN -->
   <section class="track-section" id="presentacion" data-label="SECCIÓN 01 / PRESENTACIÓN">
     <div class="wrap hero-grid">
-      <div class="hero-illustration" role="img" aria-label="Espacio reservado para ilustración">
+      <div class="hero-illustration reveal" role="img" aria-label="Espacio reservado para ilustración">
         <span>Ilustración</span>
       </div>
       <div>
-        <p class="eyebrow">Archivo digital personal</p>
-        <h1 class="hero-headline">Un archivo digital de proyectos, ordenado como un expediente.</h1>
-        <p class="hero-sub">Le invitamos a recorrer una selección de proyectos documentados con categoría, estado, año y tecnologías, tal como en un archivo físico.</p>
-        <button class="btn" id="btnVerProyectos" type="button">
+        <p class="eyebrow reveal">dhg1909</p>
+        <h1 class="hero-headline reveal">Un archivo digital de proyectos, ordenado como un expediente.</h1>
+        <p class="hero-sub reveal">Le invitamos a recorrer una selección de proyectos documentados con categoría, estado, año y tecnologías, tal como en un archivo físico.</p>
+        <button class="btn reveal" id="btnVerProyectos" type="button">
           Ver proyectos
           <span class="btn-arrow" aria-hidden="true">&#8594;</span>
         </button>
@@ -808,7 +861,7 @@ main{ position:relative; z-index:1; }
   <!-- PROYECTOS: CARRUSEL -->
   <section class="track-section" id="proyectos" data-label="SECCIÓN 02 / PROYECTOS">
     <div class="wrap">
-      <h2 class="proyectos-heading">Mi trabajo:</h2>
+      <h2 class="proyectos-heading reveal">Mi trabajo:</h2>
       <div class="carousel">
         <button class="carousel-arrow prev" id="carouselPrev" type="button" aria-label="Proyecto anterior">&#8592;</button>
         <div class="carousel-track" id="carouselTrack"></div>
@@ -823,11 +876,11 @@ main{ position:relative; z-index:1; }
   <!-- FINAL -->
   <section class="track-section" id="contacto" data-label="SECCIÓN 03 / CONTACTO">
     <div class="wrap">
-      <h2 class="final-heading">Muchas gracias</h2>
+      <h2 class="final-heading reveal">Muchas gracias</h2>
       <div class="final-copy">
-        <p>Muchas gracias por recorrer este archivo digital.</p>
-        <p>Cada proyecto documenta una etapa distinta de aprendizaje, diseño y desarrollo.</p>
-        <p>Este espacio continuará creciendo con nuevos trabajos y experimentos.</p>
+        <p class="reveal">Muchas gracias por recorrer este archivo digital.</p>
+        <p class="reveal">Cada proyecto documenta una etapa distinta de aprendizaje, diseño y desarrollo.</p>
+        <p class="reveal">Este espacio continuará creciendo con nuevos trabajos y experimentos.</p>
       </div>
     </div>
   </section>
@@ -855,7 +908,7 @@ main{ position:relative; z-index:1; }
       categoria: "Educación",
       estado: "Publicado",
       anio: "2026",
-      tecnologias: ["HTML", "CSS", "JavaScript"],
+      tecnologias: ["HTML"],
       descripcion: "Proyecto educativo documentado dentro de este archivo. Texto descriptivo pendiente de redacción final."
     },
     {
@@ -864,7 +917,7 @@ main{ position:relative; z-index:1; }
       categoria: "Diseño",
       estado: "Publicado",
       anio: "2026",
-      tecnologias: ["HTML", "CSS", "JavaScript"],
+      tecnologias: ["HTML"],
       descripcion: "Proyecto de exploración visual documentado dentro de este archivo. Texto descriptivo pendiente de redacción final."
     },
     {
@@ -873,7 +926,7 @@ main{ position:relative; z-index:1; }
       categoria: "Utilidad",
       estado: "Publicado",
       anio: "2026",
-      tecnologias: ["HTML", "CSS", "JavaScript"],
+      tecnologias: ["HTML"],
       descripcion: "Proyecto de utilidad documentado dentro de este archivo. Texto descriptivo pendiente de redacción final."
     }
   ];
@@ -1107,6 +1160,34 @@ main{ position:relative; z-index:1; }
   trackSections.forEach(function(section){ observer.observe(section); });
 
   /* ==========================================================
+     ANIMACIONES DE ENTRADA AL HACER SCROLL
+     ========================================================== */
+  var revealEls = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  // stagger dentro de cada sección
+  var seen = {};
+  revealEls.forEach(function(el){
+    var parent = el.closest(".track-section") || document.body;
+    var key = trackSections.indexOf(parent);
+    seen[key] = (seen[key] || 0);
+    el.style.transitionDelay = (seen[key] * 0.09) + "s";
+    seen[key]++;
+  });
+
+  if (!reduceMotion){
+    var revealObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          entry.target.classList.add("in-view");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+    revealEls.forEach(function(el){ revealObserver.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add("in-view"); });
+  }
+
+  /* ==========================================================
      SECUENCIA DE CARGA
      ========================================================== */
   var loader = document.getElementById("loader");
@@ -1115,17 +1196,18 @@ main{ position:relative; z-index:1; }
   var topbar = document.getElementById("topbar");
   var statusbar = document.getElementById("statusbar");
   var indicatorNav = document.getElementById("indicator");
-  var themeToggleBtn = document.getElementById("themeToggle");
   var body = document.body;
 
   var mensajes = ["Inicializando...", "Preparando interfaz...", "Cargando proyectos...", "Listo."];
+  var MSG_STEP = 620;      // duración de cada mensaje
+  var HOLD_AFTER = 900;    // tiempo extra con el logo grande y quieto tras "Listo."
+  var DOCK_AT = mensajes.length * MSG_STEP + HOLD_AFTER;
 
   function finishLoading(){
     body.classList.remove("locked");
     topbar.classList.add("visible");
     statusbar.classList.add("visible");
     indicatorNav.classList.add("visible");
-    themeToggleBtn.classList.add("visible");
     loader.classList.add("hide");
     dots[0] && dots[0].classList.add("active");
   }
@@ -1139,19 +1221,23 @@ main{ position:relative; z-index:1; }
     var msgInterval = window.setInterval(function(){
       step++;
       if (step < mensajes.length){
-        loaderStatus.textContent = mensajes[step];
+        loaderStatus.classList.add("fading");
+        window.setTimeout(function(){
+          loaderStatus.textContent = mensajes[step];
+          loaderStatus.classList.remove("fading");
+        }, 180);
       }
-    }, 400);
+    }, MSG_STEP);
 
     window.setTimeout(function(){
       window.clearInterval(msgInterval);
       brandLogo.classList.add("docked");
       finishLoading();
-    }, 1600);
+    }, DOCK_AT);
 
     window.setTimeout(function(){
       loader.style.display = "none";
-    }, 1600 + 700);
+    }, DOCK_AT + 700);
   }
 
 })();

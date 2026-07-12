@@ -689,695 +689,472 @@ main{ position:relative; z-index:1; }
       <rect class="p2" x="555.56" y="222.22" width="194.44" height="27.78"/>
       <rect class="p2" x="652.78" y="138.89" width="138.89" height="55.56"/>
       <circle class="p2" cx="791.67" cy="152.78" r="13.89"/>
-     <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DHG — Archivo Digital Personal</title>
-<meta name="description" content="Archivo digital de proyectos de DHG.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-
-/* ============================================================
-   0. TOKENS
-   ============================================================ */
-:root{
-  --c-bg:#ffffff;
-  --c-bg-soft:#f2f2f2;
-  --c-mid:#9a9a9a;
-  --c-fg:#141414;
-  --c-fg-soft:#5c5c5c;
-  --c-border: rgba(20,20,20,.14);
-  --c-border-strong: rgba(20,20,20,.5);
-  --c-grid: rgba(20,20,20,.045);
-
-  --font-display:'Space Grotesk', sans-serif;
-  --font-mono:'IBM Plex Mono', monospace;
-
-  --dur-btn:.25s;
-  --dur-carousel:.7s;
-  --dur-text:.6s;
-  --dur-scroll:.9s;
-  --dur-theme:.5s;
-  --dur-logo:2s;
-
-  --ease-std: cubic-bezier(.16,1,.3,1);
-
-  --topbar-h: 64px;
-  --statusbar-h: 34px;
-}
-
-[data-theme="dark"]{
-  --c-bg:#141414;
-  --c-bg-soft:#232323;
-  --c-mid:#c9c9c9;
-  --c-fg:#f5f5f5;
-  --c-fg-soft:#a8a8a8;
-  --c-border: rgba(245,245,245,.14);
-  --c-border-strong: rgba(245,245,245,.5);
-  --c-grid: rgba(245,245,245,.045);
-}
-
-*{ box-sizing:border-box; }
-html{
-  scroll-behavior:smooth;
-  scroll-snap-type:y proximity;
-}
-html.no-smooth-scroll{ scroll-behavior:auto; }
-
-body{
-  margin:0;
-  background:var(--c-bg);
-  color:var(--c-fg);
-  font-family:var(--font-display);
-  transition:background var(--dur-theme) var(--ease-std), color var(--dur-theme) var(--ease-std);
-  overflow-x:hidden;
-}
-body.locked{ overflow:hidden; height:100vh; }
-
-a{ color:inherit; }
-button{ font-family:inherit; }
-
-::selection{ background:var(--c-fg); color:var(--c-bg); }
-
-/* subtle background grid */
-.bg-grid{
-  position:fixed; inset:0; z-index:0; pointer-events:none;
-  background-image:
-    linear-gradient(var(--c-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
-  background-size:48px 48px;
-  transition:background-image var(--dur-theme) var(--ease-std);
-}
-
-:focus-visible{
-  outline:2px solid var(--c-fg);
-  outline-offset:3px;
-}
-
-/* ============================================================
-   1. LOADER
-   ============================================================ */
-.loader{
-  position:fixed; inset:0; z-index:9998;
-  background:var(--c-bg);
-  display:flex; align-items:center; justify-content:center;
-  transition:opacity .6s var(--ease-std), visibility .6s var(--ease-std);
-}
-.loader.hide{ opacity:0; visibility:hidden; }
-
-.loader-status{
-  position:absolute;
-  bottom:14%;
-  left:50%;
-  transform:translateX(-50%);
-  font-family:var(--font-mono);
-  font-size:.72rem;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color:var(--c-fg-soft);
-  min-height:1em;
-}
-
-/* shared brand logo — moves from loader center to topbar dock */
-.brand-logo{
-  position:fixed;
-  left:50%; top:50%;
-  width:210px;
-  transform:translate(-50%,-50%) scale(1);
-  z-index:10000;
-  transition:
-    transform var(--dur-logo) var(--ease-std),
-    top var(--dur-logo) var(--ease-std),
-    width var(--dur-logo) var(--ease-std);
-  filter:drop-shadow(0 0 0 transparent);
-}
-.brand-logo svg{ display:block; width:100%; height:auto; }
-.brand-logo .logo-negative{ display:none; }
-[data-theme="dark"] .brand-logo .logo-positive{ display:none; }
-[data-theme="dark"] .brand-logo .logo-negative{ display:block; }
-
-.brand-logo.docked{
-  top:calc(var(--topbar-h) / 2);
-  width:74px;
-  transform:translate(-50%,-50%) scale(1);
-}
-
-/* ============================================================
-   2. TOPBAR + STATUSBAR
-   ============================================================ */
-.topbar{
-  position:fixed; top:0; left:0; right:0;
-  height:var(--topbar-h);
-  z-index:500;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 clamp(16px, 4vw, 40px);
-  background:var(--c-bg);
-  border-bottom:1px solid var(--c-border);
-  opacity:0;
-  transition:opacity .6s var(--ease-std), background var(--dur-theme) var(--ease-std), border-color var(--dur-theme) var(--ease-std);
-}
-.topbar.visible{ opacity:1; }
-
-.topbar-date, .topbar-time{
-  font-family:var(--font-mono);
-  font-size:.78rem;
-  letter-spacing:.06em;
-  color:var(--c-fg-soft);
-  min-width:78px;
-}
-.topbar-time{ text-align:right; }
-.topbar-logo-slot{ width:74px; height:1px; } /* spacer, brand-logo docks visually above this */
-
-.statusbar{
-  position:fixed;
-  top:var(--topbar-h); left:0; right:0;
-  height:var(--statusbar-h);
-  z-index:490;
-  display:flex; align-items:center;
-  padding:0 clamp(16px, 4vw, 40px);
-  background:var(--c-bg-soft);
-  border-bottom:1px solid var(--c-border);
-  opacity:0;
-  transition:opacity .6s var(--ease-std) .1s, background var(--dur-theme) var(--ease-std), border-color var(--dur-theme) var(--ease-std);
-}
-.statusbar.visible{ opacity:1; }
-.statusbar-label{
-  font-family:var(--font-mono);
-  font-size:.68rem;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:var(--c-fg-soft);
-  transition:opacity var(--dur-text) var(--ease-std);
-}
-
-/* ============================================================
-   3. LATERAL INDICATOR
-   ============================================================ */
-.indicator{
-  position:fixed;
-  right:22px; top:50%;
-  transform:translateY(-50%);
-  z-index:480;
-  display:flex; flex-direction:column; align-items:center;
-  gap:0;
-  opacity:0;
-  transition:opacity .6s var(--ease-std) .2s;
-}
-.indicator.visible{ opacity:1; }
-.indicator-dot{
-  width:7px; height:7px; border-radius:50%;
-  border:1px solid var(--c-border-strong);
-  background:transparent;
-  transition:background var(--dur-theme) var(--ease-std), transform .3s var(--ease-std);
-  cursor:pointer;
-  padding:0;
-}
-.indicator-dot.active{
-  background:var(--c-fg);
-  transform:scale(1.3);
-}
-.indicator-line{
-  width:1px; height:20px;
-  background:var(--c-border);
-}
-@media (max-width: 860px){
-  .indicator{ display:none; }
-}
-
-/* ============================================================
-   4. THEME TOGGLE
-   ============================================================ */
-.theme-toggle{
-  position:fixed;
-  left:22px; bottom:22px;
-  z-index:480;
-  font-family:var(--font-mono);
-  font-size:.64rem;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color:var(--c-fg);
-  background:var(--c-bg);
-  border:1px solid var(--c-border-strong);
-  border-radius:999px;
-  padding:9px 16px;
-  cursor:pointer;
-  transition:background var(--dur-btn) var(--ease-std), color var(--dur-btn) var(--ease-std), opacity .6s var(--ease-std) .2s;
-  opacity:0;
-}
-.theme-toggle.visible{ opacity:1; }
-@media (hover:hover) and (pointer:fine){
-  .theme-toggle:hover{ background:var(--c-fg); color:var(--c-bg); }
-}
-
-/* ============================================================
-   5. LAYOUT PRIMITIVES
-   ============================================================ */
-main{ position:relative; z-index:1; }
-
-.track-section{
-  min-height:100vh;
-  padding-top:calc(var(--topbar-h) + var(--statusbar-h));
-  scroll-snap-align:start;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  position:relative;
-}
-
-.wrap{
-  width:100%;
-  max-width:1240px;
-  margin:0 auto;
-  padding:0 clamp(20px, 5vw, 56px);
-}
-
-.eyebrow{
-  font-family:var(--font-mono);
-  font-size:.7rem;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  color:var(--c-fg-soft);
-  margin:0 0 18px;
-}
-
-.btn{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  font-family:var(--font-display);
-  font-weight:500;
-  font-size:.92rem;
-  letter-spacing:.01em;
-  color:var(--c-bg);
-  background:var(--c-fg);
-  border:1px solid var(--c-fg);
-  border-radius:999px;
-  padding:14px 26px;
-  cursor:pointer;
-  transition:background var(--dur-btn) var(--ease-std), color var(--dur-btn) var(--ease-std), transform var(--dur-btn) var(--ease-std);
-}
-@media (hover:hover) and (pointer:fine){
-  .btn:hover{ background:var(--c-bg); color:var(--c-fg); }
-}
-.btn:active{ transform:scale(.97); }
-.btn-arrow{ transition:transform var(--dur-btn) var(--ease-std); }
-.btn:hover .btn-arrow{ transform:translateX(3px); }
-
-.btn-outline{
-  background:transparent;
-  color:var(--c-fg);
-}
-@media (hover:hover) and (pointer:fine){
-  .btn-outline:hover{ background:var(--c-fg); color:var(--c-bg); }
-}
-
-/* ============================================================
-   6. HERO / PRESENTACION
-   ============================================================ */
-.hero-grid{
-  display:grid;
-  grid-template-columns:1fr 2fr;
-  gap:clamp(28px, 5vw, 72px);
-  align-items:center;
-}
-.hero-illustration{
-  aspect-ratio:1/1;
-  border:1px solid var(--c-border);
-  position:relative;
-  overflow:hidden;
-  background:var(--c-bg-soft);
-}
-.hero-illustration::before,
-.hero-illustration::after{
-  content:'';
-  position:absolute;
-  left:50%; top:50%;
-  width:140%; height:1px;
-  background:var(--c-border-strong);
-}
-.hero-illustration::before{ transform:translate(-50%,-50%) rotate(45deg); }
-.hero-illustration::after{ transform:translate(-50%,-50%) rotate(-45deg); }
-.hero-illustration span{
-  position:absolute; bottom:16px; left:16px;
-  font-family:var(--font-mono);
-  font-size:.62rem;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color:var(--c-fg-soft);
-  background:var(--c-bg);
-  padding:3px 8px;
-}
-
-.hero-headline{
-  font-size:clamp(1.9rem, 4.4vw, 3.15rem);
-  line-height:1.14;
-  font-weight:600;
-  margin:0 0 20px;
-  max-width:16ch;
-}
-.hero-sub{
-  font-family:var(--font-display);
-  font-size:1.02rem;
-  line-height:1.6;
-  color:var(--c-fg-soft);
-  max-width:52ch;
-  margin:0 0 34px;
-}
-
-@media (max-width: 860px){
-  .hero-grid{ grid-template-columns:1fr; }
-  .hero-illustration{ max-width:220px; margin:0 auto 8px; aspect-ratio:1/1; }
-}
-
-/* ============================================================
-   7. PROYECTOS — CARRUSEL
-   ============================================================ */
-.proyectos-heading{
-  font-size:clamp(1.6rem, 3.2vw, 2.4rem);
-  font-weight:600;
-  margin:0 0 44px;
-}
-
-.carousel{
-  position:relative;
-  height:min(58vh, 460px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.carousel-track{
-  position:relative;
-  width:100%;
-  height:100%;
-}
-.carousel-card{
-  position:absolute;
-  left:50%; top:50%;
-  width:min(58vw, 340px);
-  height:min(70%, 340px);
-  transform:translate(-50%,-50%);
-  background:var(--c-bg);
-  border:1px solid var(--c-border);
-  transition:transform var(--dur-carousel) var(--ease-std), opacity var(--dur-carousel) var(--ease-std);
-  display:flex; flex-direction:column;
-  cursor:pointer;
-  overflow:hidden;
-}
-.carousel-card-preview{
-  flex:1;
-  background:var(--c-bg-soft);
-  position:relative;
-}
-.carousel-card-preview::before,
-.carousel-card-preview::after{
-  content:''; position:absolute; left:50%; top:50%;
-  width:130%; height:1px; background:var(--c-border);
-}
-.carousel-card-preview::before{ transform:translate(-50%,-50%) rotate(45deg); }
-.carousel-card-preview::after{ transform:translate(-50%,-50%) rotate(-45deg); }
-
-.carousel-card-overlay{
-  position:absolute; inset:0;
-  display:flex; align-items:center; justify-content:center;
-  background:var(--c-fg);
-  color:var(--c-bg);
-  opacity:0;
-  transition:opacity var(--dur-btn) var(--ease-std);
-  font-family:var(--font-mono);
-  font-size:.72rem;
-  letter-spacing:.18em;
-}
-@media (hover:hover) and (pointer:fine){
-  .carousel-card.is-active:hover .carousel-card-overlay{ opacity:.94; }
-}
-
-.carousel-card-foot{
-  padding:14px 16px;
-  border-top:1px solid var(--c-border);
-}
-.carousel-card-code{
-  font-family:var(--font-mono);
-  font-size:.66rem;
-  letter-spacing:.12em;
-  color:var(--c-fg-soft);
-  margin:0 0 2px;
-}
-.carousel-card-name{
-  font-weight:600;
-  font-size:1rem;
-  margin:0;
-}
-.carousel-card-url{
-  font-family:var(--font-mono);
-  font-size:.68rem;
-  color:var(--c-fg-soft);
-  margin:2px 0 0;
-}
-
-.carousel-arrow{
-  position:absolute; top:50%; transform:translateY(-50%);
-  width:44px; height:44px;
-  border-radius:50%;
-  border:1px solid var(--c-border-strong);
-  background:var(--c-bg);
-  color:var(--c-fg);
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer;
-  z-index:5;
-  transition:background var(--dur-btn) var(--ease-std), color var(--dur-btn) var(--ease-std);
-}
-.carousel-arrow.prev{ left:clamp(0px, 2vw, 24px); }
-.carousel-arrow.next{ right:clamp(0px, 2vw, 24px); }
-@media (hover:hover) and (pointer:fine){
-  .carousel-arrow:hover{ background:var(--c-fg); color:var(--c-bg); }
-}
-@media (max-width: 640px){
-  .carousel-arrow{ width:36px; height:36px; }
-}
-
-/* ============================================================
-   8. PROYECTO — VISTA DETALLE
-   ============================================================ */
-.proyecto-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:clamp(24px, 5vw, 64px);
-  align-items:center;
-}
-.proyecto-preview{
-  aspect-ratio:4/3;
-  border:1px solid var(--c-border);
-  background:var(--c-bg-soft);
-  position:relative;
-  overflow:hidden;
-}
-.proyecto-preview::before,
-.proyecto-preview::after{
-  content:''; position:absolute; left:50%; top:50%;
-  width:135%; height:1px; background:var(--c-border-strong);
-}
-.proyecto-preview::before{ transform:translate(-50%,-50%) rotate(45deg); }
-.proyecto-preview::after{ transform:translate(-50%,-50%) rotate(-45deg); }
-
-.proyecto-code{
-  font-family:var(--font-mono);
-  font-size:.72rem;
-  letter-spacing:.16em;
-  color:var(--c-fg-soft);
-  margin:0 0 10px;
-}
-.proyecto-name{
-  font-size:clamp(1.5rem, 3vw, 2.1rem);
-  font-weight:600;
-  margin:0 0 6px;
-}
-.proyecto-url{
-  font-family:var(--font-mono);
-  font-size:.78rem;
-  color:var(--c-fg-soft);
-  margin:0 0 20px;
-  word-break:break-all;
-}
-.proyecto-desc{
-  font-size:.98rem;
-  line-height:1.6;
-  color:var(--c-fg-soft);
-  max-width:48ch;
-  margin:0 0 24px;
-}
-.proyecto-meta{
-  display:grid;
-  grid-template-columns:repeat(3, auto);
-  gap:22px;
-  margin:0 0 22px;
-  padding:0;
-}
-.proyecto-meta div{
-  font-family:var(--font-mono);
-}
-.proyecto-meta dt{
-  font-size:.62rem;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color:var(--c-fg-soft);
-  margin:0 0 4px;
-}
-.proyecto-meta dd{
-  font-size:.86rem;
-  margin:0;
-}
-.proyecto-tech{
-  display:flex; flex-wrap:wrap; gap:8px;
-  list-style:none; padding:0; margin:0 0 30px;
-}
-.proyecto-tech li{
-  font-family:var(--font-mono);
-  font-size:.68rem;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  border:1px solid var(--c-border-strong);
-  border-radius:999px;
-  padding:5px 12px;
-  color:var(--c-fg-soft);
-}
-
-@media (max-width: 860px){
-  .proyecto-grid{ grid-template-columns:1fr; }
-  .proyecto-meta{ grid-template-columns:repeat(3, 1fr); }
-}
-
-/* transición entre proyectos */
-.banda-transicion{
-  height:34vh;
-  min-height:180px;
-  display:flex; align-items:center; justify-content:center;
-  border-top:1px solid var(--c-border);
-  border-bottom:1px solid var(--c-border);
-  background:var(--c-bg-soft);
-}
-.banda-transicion span{
-  font-family:var(--font-mono);
-  font-size:clamp(1.1rem, 3vw, 1.8rem);
-  letter-spacing:.1em;
-  color:var(--c-fg-soft);
-}
-
-/* ============================================================
-   9. CONTACTO / FINAL
-   ============================================================ */
-.final-heading{
-  font-size:clamp(2rem, 5vw, 3.4rem);
-  font-weight:700;
-  margin:0 0 22px;
-}
-.final-copy p{
-  font-size:1rem;
-  line-height:1.7;
-  color:var(--c-fg-soft);
-  max-width:56ch;
-  margin:0 0 14px;
-}
-
-.contacto-band{
-  border-top:1px solid var(--c-border);
-  padding:26px clamp(20px, 5vw, 56px);
-  display:flex; align-items:center; justify-content:center;
-  scroll-snap-align:start;
-}
-.contacto-band a{
-  font-family:var(--font-mono);
-  font-size:.92rem;
-  letter-spacing:.04em;
-  text-decoration:none;
-  border-bottom:1px solid var(--c-border-strong);
-  padding-bottom:2px;
-  transition:opacity var(--dur-btn) var(--ease-std);
-}
-@media (hover:hover) and (pointer:fine){
-  .contacto-band a:hover{ opacity:.55; }
-}
-
-/* ============================================================
-   10. REDUCED MOTION
-   ============================================================ */
-@media (prefers-reduced-motion: reduce){
-  html{ scroll-behavior:auto; }
-  .brand-logo, .loader, .topbar, .statusbar, .indicator, .theme-toggle,
-  .carousel-card, .btn, .btn-arrow, .carousel-card-overlay, .carousel-arrow{
-    transition-duration:.01ms !important;
-  }
-}
-</style>
-</head>
-<body class="locked">
-
-<div class="bg-grid" aria-hidden="true"></div>
-
-<!-- ============================================================
-     LOADER
-     ============================================================ -->
-<div class="loader" id="loader" role="status" aria-live="polite">
-  <p class="loader-status" id="loaderStatus">Inicializando...</p>
+      <circle class="p2" cx="652.78" cy="152.78" r="13.89"/>
+      <circle class="p2" cx="791.67" cy="97.22" r="13.89"/>
+      <circle class="p2" cx="750" cy="55.56" r="55.56"/>
+      <rect class="p2" x="555.56" width="194.44" height="111.11"/>
+      <rect class="p2" x="555.56" y="83.33" width="236.11" height="27.78"/>
+      <rect class="p2" x="555.56" y="55.56" width="250" height="41.67"/>
+      <rect class="p2" x="743.06" y="138.89" width="48.61" height="62.5"/>
+      <circle class="p1" cx="743.06" cy="201.39" r="6.94"/>
+    </g>
+  </svg>
+  <svg class="logo-negative" viewBox="0 0 805.56 250" xmlns="http://www.w3.org/2000/svg">
+    <defs><style>.n1{fill:#fff;}.n2{fill:#1d1d1b;}</style></defs>
+    <rect class="n2" width="805.56" height="250"/>
+    <g>
+      <rect class="n1" y="55.56" width="250" height="138.89"/>
+      <rect class="n1" x="55.56" width="194.44" height="250"/>
+      <circle class="n1" cx="55.56" cy="194.44" r="55.56"/>
+      <circle class="n1" cx="55.56" cy="55.56" r="55.56"/>
+      <g>
+        <rect class="n2" x="194.44" y="145.83" width="27.78" height="41.67"/>
+        <rect class="n2" x="201.39" y="138.89" width="20.83" height="55.56"/>
+        <circle class="n2" cx="201.39" cy="187.5" r="6.94"/>
+        <circle class="n2" cx="201.39" cy="145.83" r="6.94"/>
+      </g>
+    </g>
+    <g>
+      <rect class="n1" x="277.78" y="131.94" width="250" height="69.44"/>
+      <g>
+        <rect class="n1" x="416.67" y="13.89" width="111.11" height="222.22" transform="translate(944.44 250) rotate(180)"/>
+        <rect class="n1" x="430.56" y="0" width="97.22" height="250" transform="translate(958.33 250) rotate(180)"/>
+        <circle class="n1" cx="430.56" cy="236.11" r="13.89"/>
+        <circle class="n1" cx="430.56" cy="13.89" r="13.89"/>
+      </g>
+      <g>
+        <rect class="n1" x="277.78" y="13.89" width="111.11" height="222.22"/>
+        <rect class="n1" x="277.78" width="97.22" height="250"/>
+        <circle class="n1" cx="375" cy="236.11" r="13.89"/>
+        <circle class="n1" cx="375" cy="13.89" r="13.89"/>
+      </g>
+      <g>
+        <rect class="n2" x="395.83" y="194.44" width="13.89" height="13.89"/>
+        <rect class="n2" x="388.89" y="201.39" width="27.78" height="48.61"/>
+        <g><circle class="n2" cx="395.83" cy="201.39" r="6.94"/><circle class="n2" cx="409.72" cy="201.39" r="6.94"/></g>
+      </g>
+      <g>
+        <rect class="n2" x="395.83" y="125" width="13.89" height="13.89"/>
+        <rect class="n2" x="388.89" width="27.78" height="131.94"/>
+        <g><circle class="n2" cx="395.83" cy="131.94" r="6.94"/><circle class="n2" cx="409.72" cy="131.94" r="6.94"/></g>
+      </g>
+    </g>
+    <g>
+      <circle class="n1" cx="750" cy="194.44" r="55.56"/>
+      <circle class="n2" cx="729.17" cy="201.39" r="20.83"/>
+      <rect class="n1" x="555.56" width="97.22" height="250"/>
+      <rect class="n2" x="652.78" y="111.11" width="76.39" height="111.11"/>
+      <rect class="n2" x="611.11" y="152.78" width="83.33" height="27.78"/>
+      <circle class="n2" cx="652.78" cy="180.56" r="41.67"/>
+      <circle class="n2" cx="652.78" cy="152.78" r="41.67"/>
+      <circle class="n1" cx="652.78" cy="180.56" r="13.89"/>
+      <rect class="n1" x="638.89" y="152.78" width="166.67" height="27.78"/>
+      <rect class="n1" x="652.78" y="152.78" width="152.78" height="41.67"/>
+      <rect class="n1" x="555.56" y="222.22" width="194.44" height="27.78"/>
+      <rect class="n1" x="652.78" y="138.89" width="138.89" height="55.56"/>
+      <circle class="n1" cx="791.67" cy="152.78" r="13.89"/>
+      <circle class="n1" cx="652.78" cy="152.78" r="13.89"/>
+      <circle class="n1" cx="791.67" cy="97.22" r="13.89"/>
+      <circle class="n1" cx="750" cy="55.56" r="55.56"/>
+      <rect class="n1" x="555.56" width="194.44" height="111.11"/>
+      <rect class="n1" x="555.56" y="83.33" width="236.11" height="27.78"/>
+      <rect class="n1" x="555.56" y="55.56" width="250" height="41.67"/>
+      <rect class="n1" x="743.06" y="138.89" width="48.61" height="62.5"/>
+      <circle class="n2" cx="743.06" cy="201.39" r="6.94"/>
+    </g>
+  </svg>
 </div>
 
-<!-- shared logo: lives in loader first, docks into topbar -->
-<div class="brand-logo" id="brandLogo" aria-hidden="true">
-  <svg class="logo-positive" viewBox="0 0 805.56 250" xmlns="http://www.w3.org/2000/svg">
-    <defs><style>.p1{fill:#fff;}.p2{fill:#1d1d1b;}</style></defs>
-    <rect class="p1" width="805.56" height="250"/>
-    <g>
-      <rect class="p2" y="55.56" width="250" height="138.89"/>
-      <rect class="p2" x="55.56" width="194.44" height="250"/>
-      <circle class="p2" cx="55.56" cy="194.44" r="55.56"/>
-      <circle class="p2" cx="55.56" cy="55.56" r="55.56"/>
-      <g>
-        <rect class="p1" x="194.44" y="145.83" width="27.78" height="41.67"/>
-        <rect class="p1" x="201.39" y="138.89" width="20.83" height="55.56"/>
-        <circle class="p1" cx="201.39" cy="187.5" r="6.94"/>
-        <circle class="p1" cx="201.39" cy="145.83" r="6.94"/>
-      </g>
-    </g>
-    <g>
-      <rect class="p2" x="277.78" y="131.94" width="250" height="69.44"/>
-      <g>
-        <rect class="p2" x="416.67" y="13.89" width="111.11" height="222.22" transform="translate(944.44 250) rotate(180)"/>
-        <rect class="p2" x="430.56" y="0" width="97.22" height="250" transform="translate(958.33 250) rotate(180)"/>
-        <circle class="p2" cx="430.56" cy="236.11" r="13.89"/>
-        <circle class="p2" cx="430.56" cy="13.89" r="13.89"/>
-      </g>
-      <g>
-        <rect class="p2" x="277.78" y="13.89" width="111.11" height="222.22"/>
-        <rect class="p2" x="277.78" width="97.22" height="250"/>
-        <circle class="p2" cx="375" cy="236.11" r="13.89"/>
-        <circle class="p2" cx="375" cy="13.89" r="13.89"/>
-      </g>
-      <g>
-        <rect class="p1" x="395.83" y="194.44" width="13.89" height="13.89"/>
-        <rect class="p1" x="388.89" y="201.39" width="27.78" height="48.61"/>
-        <g><circle class="p1" cx="395.83" cy="201.39" r="6.94"/><circle class="p1" cx="409.72" cy="201.39" r="6.94"/></g>
-      </g>
-      <g>
-        <rect class="p1" x="395.83" y="125" width="13.89" height="13.89"/>
-        <rect class="p1" x="388.89" width="27.78" height="131.94"/>
-        <g><circle class="p1" cx="395.83" cy="131.94" r="6.94"/><circle class="p1" cx="409.72" cy="131.94" r="6.94"/></g>
-      </g>
-    </g>
-    <g>
-      <circle class="p2" cx="750" cy="194.44" r="55.56"/>
-      <circle class="p1" cx="729.17" cy="201.39" r="20.83"/>
-      <rect class="p2" x="555.56" width="97.22" height="250"/>
-      <rect class="p1" x="652.78" y="111.11" width="76.39" height="111.11"/>
-      <rect class="p1" x="611.11" y="152.78" width="83.33" height="27.78"/>
-      <circle class="p1" cx="652.78" cy="180.56" r="41.67"/>
-      <circle class="p1" cx="652.78" cy="152.78" r="41.67"/>
-      <circle class="p2" cx="652.78" cy="180.56" r="13.89"/>
-      <rect class="p2" x="638.89" y="152.78" width="166.67" height="27.78"/>
-      <rect class="p2" x="652.78" y="152.78" width="152.78" height="41.67"/>
-      <rect class="p2" x="555.56" y="222.22" width="194.44" height="27.78"/>
-      <rect class="p2" x="652.78" y="138.89" width="138.89" height="55.56"/>
-      <circle class="p2" cx="791.67" cy="152.78" r="13.89"/>
-     
+<!-- ============================================================
+     TOPBAR
+     ============================================================ -->
+<header class="topbar" id="topbar">
+  <time class="topbar-date" id="topbarDate">00/00/00</time>
+  <div class="topbar-logo-slot" aria-hidden="true"></div>
+  <time class="topbar-time" id="topbarTime">00:00:00</time>
+</header>
+
+<div class="statusbar" id="statusbar">
+  <p class="statusbar-label" id="statusbarLabel">SECCIÓN 01 / PRESENTACIÓN</p>
+</div>
+
+<nav class="indicator" id="indicator" aria-label="Progreso de navegación"></nav>
+
+<button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Modo oscuro</button>
+
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
+<main>
+
+  <!-- PRESENTACIÓN -->
+  <section class="track-section" id="presentacion" data-label="SECCIÓN 01 / PRESENTACIÓN">
+    <div class="wrap hero-grid">
+      <div class="hero-illustration" role="img" aria-label="Espacio reservado para ilustración">
+        <span>Ilustración</span>
+      </div>
+      <div>
+        <p class="eyebrow">Archivo digital personal</p>
+        <h1 class="hero-headline">Un archivo digital de proyectos, ordenado como un expediente.</h1>
+        <p class="hero-sub">Le invitamos a recorrer una selección de proyectos documentados con categoría, estado, año y tecnologías, tal como en un archivo físico.</p>
+        <button class="btn" id="btnVerProyectos" type="button">
+          Ver proyectos
+          <span class="btn-arrow" aria-hidden="true">&#8594;</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROYECTOS: CARRUSEL -->
+  <section class="track-section" id="proyectos" data-label="SECCIÓN 02 / PROYECTOS">
+    <div class="wrap">
+      <h2 class="proyectos-heading">Mi trabajo:</h2>
+      <div class="carousel">
+        <button class="carousel-arrow prev" id="carouselPrev" type="button" aria-label="Proyecto anterior">&#8592;</button>
+        <div class="carousel-track" id="carouselTrack"></div>
+        <button class="carousel-arrow next" id="carouselNext" type="button" aria-label="Proyecto siguiente">&#8594;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROYECTOS: DETALLE (generado dinámicamente) -->
+  <div id="proyectosDetalle"></div>
+
+  <!-- FINAL -->
+  <section class="track-section" id="contacto" data-label="SECCIÓN 03 / CONTACTO">
+    <div class="wrap">
+      <h2 class="final-heading">Muchas gracias</h2>
+      <div class="final-copy">
+        <p>Muchas gracias por recorrer este archivo digital.</p>
+        <p>Cada proyecto documenta una etapa distinta de aprendizaje, diseño y desarrollo.</p>
+        <p>Este espacio continuará creciendo con nuevos trabajos y experimentos.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="contacto-band track-section-band">
+    <a href="mailto:Archivo1909@gmail.com">Archivo1909@gmail.com</a>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ==========================================================
+     DATOS DE PROYECTOS
+     Para agregar un proyecto nuevo, solo agregue un objeto aquí.
+     El código ARCHIVO-00N, el carrusel, las secciones de detalle,
+     las bandas de transición y el indicador lateral se generan solos.
+     ========================================================== */
+  var proyectos = [
+    {
+      nombre: "QUIM",
+      url: "https://quimdhg1909.github.io",
+      categoria: "Educación",
+      estado: "Publicado",
+      anio: "2026",
+      tecnologias: ["HTML", "CSS", "JavaScript"],
+      descripcion: "Proyecto educativo documentado dentro de este archivo. Texto descriptivo pendiente de redacción final."
+    },
+    {
+      nombre: "GEOME",
+      url: "https://geome1909.github.io/",
+      categoria: "Diseño",
+      estado: "Publicado",
+      anio: "2026",
+      tecnologias: ["HTML", "CSS", "JavaScript"],
+      descripcion: "Proyecto de exploración visual documentado dentro de este archivo. Texto descriptivo pendiente de redacción final."
+    },
+    {
+      nombre: "EMERGENCIA",
+      url: "https://emergencia1909.github.io/",
+      categoria: "Utilidad",
+      estado: "Publicado",
+      anio: "2026",
+      tecnologias: ["HTML", "CSS", "JavaScript"],
+      descripcion: "Proyecto de utilidad documentado dentro de este archivo. Texto descriptivo pendiente de redacción final."
+    }
+  ];
+
+  proyectos.forEach(function(p, i){
+    p.codigo = "ARCHIVO-" + String(i + 1).padStart(3, "0");
+    p.id = "proyecto-" + (i + 1);
+  });
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ==========================================================
+     TEMA (claro / oscuro)
+     ========================================================== */
+  var root = document.documentElement;
+  var themeToggle = document.getElementById("themeToggle");
+
+  function applyTheme(theme){
+    if (theme === "dark"){
+      root.setAttribute("data-theme", "dark");
+      themeToggle.textContent = "Modo claro";
+      themeToggle.setAttribute("aria-pressed", "true");
+    } else {
+      root.removeAttribute("data-theme");
+      themeToggle.textContent = "Modo oscuro";
+      themeToggle.setAttribute("aria-pressed", "false");
+    }
+  }
+
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem("dhg-theme"); } catch(e){}
+  if (!savedTheme){
+    savedTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  applyTheme(savedTheme);
+
+  themeToggle.addEventListener("click", function(){
+    var current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    var next = current === "dark" ? "light" : "dark";
+    applyTheme(next);
+    try { localStorage.setItem("dhg-theme", next); } catch(e){}
+  });
+
+  /* ==========================================================
+     FECHA / HORA
+     ========================================================== */
+  var dateEl = document.getElementById("topbarDate");
+  var timeEl = document.getElementById("topbarTime");
+
+  function pad(n){ return String(n).padStart(2, "0"); }
+
+  function tick(){
+    var d = new Date();
+    dateEl.textContent = pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + String(d.getFullYear()).slice(-2);
+    timeEl.textContent = pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  /* ==========================================================
+     GENERACIÓN DINÁMICA: CARRUSEL
+     ========================================================== */
+  var track = document.getElementById("carouselTrack");
+  var activeIndex = 0;
+
+  proyectos.forEach(function(p, i){
+    var card = document.createElement("div");
+    card.className = "carousel-card";
+    card.setAttribute("data-index", i);
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-label", "Ver proyecto " + p.nombre);
+    card.innerHTML =
+      '<div class="carousel-card-preview">' +
+        '<div class="carousel-card-overlay">VER PROYECTO</div>' +
+      '</div>' +
+      '<div class="carousel-card-foot">' +
+        '<p class="carousel-card-code">' + p.codigo + '</p>' +
+        '<p class="carousel-card-name">' + p.nombre + '</p>' +
+        '<p class="carousel-card-url">' + p.url.replace(/^https?:\/\//, "") + '</p>' +
+      '</div>';
+    card.addEventListener("click", function(){
+      if (parseInt(card.getAttribute("data-index"), 10) === activeIndex){
+        goToProject(i);
+      } else {
+        setActive(i);
+      }
+    });
+    card.addEventListener("keydown", function(e){
+      if (e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        if (parseInt(card.getAttribute("data-index"), 10) === activeIndex){
+          goToProject(i);
+        } else {
+          setActive(i);
+        }
+      }
+    });
+    track.appendChild(card);
+  });
+
+  var cards = Array.prototype.slice.call(track.children);
+
+  function renderCarousel(){
+    var n = cards.length;
+    cards.forEach(function(card, i){
+      var diff = (i - activeIndex + n) % n;
+      if (diff > n / 2) diff -= n;
+      var abs = Math.abs(diff);
+      card.classList.toggle("is-active", diff === 0);
+      if (abs > 2){
+        card.style.opacity = "0";
+        card.style.pointerEvents = "none";
+        card.style.transform = "translate(-50%,-50%) translateX(" + (diff * 260) + "px) scale(0.5)";
+      } else {
+        card.style.opacity = String(1 - abs * 0.35);
+        card.style.pointerEvents = "auto";
+        card.style.transform = "translate(-50%,-50%) translateX(" + (diff * 260) + "px) scale(" + (1 - abs * 0.15) + ")";
+      }
+      card.style.zIndex = String(n - abs);
+    });
+  }
+  renderCarousel();
+
+  function setActive(i){
+    activeIndex = ((i % cards.length) + cards.length) % cards.length;
+    renderCarousel();
+  }
+
+  document.getElementById("carouselPrev").addEventListener("click", function(){ setActive(activeIndex - 1); });
+  document.getElementById("carouselNext").addEventListener("click", function(){ setActive(activeIndex + 1); });
+
+  document.getElementById("btnVerProyectos").addEventListener("click", function(){
+    document.getElementById("proyectos").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+  });
+
+  function goToProject(i){
+    var el = document.getElementById(proyectos[i].id);
+    if (el) el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+  }
+
+  /* ==========================================================
+     GENERACIÓN DINÁMICA: VISTA DE DETALLE + BANDAS DE TRANSICIÓN
+     ========================================================== */
+  var detalleContainer = document.getElementById("proyectosDetalle");
+
+  proyectos.forEach(function(p, i){
+    var section = document.createElement("section");
+    section.className = "track-section";
+    section.id = p.id;
+    section.setAttribute("data-label", "SECCIÓN 02 / PROYECTOS — " + p.nombre);
+
+    var tech = p.tecnologias.map(function(t){ return "<li>" + t + "</li>"; }).join("");
+
+    section.innerHTML =
+      '<div class="wrap proyecto-grid">' +
+        '<div class="proyecto-preview" role="img" aria-label="Vista previa de ' + p.nombre + '"></div>' +
+        '<div>' +
+          '<p class="proyecto-code">' + p.codigo + '</p>' +
+          '<h3 class="proyecto-name">' + p.nombre + '</h3>' +
+          '<p class="proyecto-url">' + p.url.replace(/^https?:\/\//, "") + '</p>' +
+          '<p class="proyecto-desc">' + p.descripcion + '</p>' +
+          '<dl class="proyecto-meta">' +
+            '<div><dt>Categoría</dt><dd>' + p.categoria + '</dd></div>' +
+            '<div><dt>Estado</dt><dd>' + p.estado + '</dd></div>' +
+            '<div><dt>Año</dt><dd>' + p.anio + '</dd></div>' +
+          '</dl>' +
+          '<ul class="proyecto-tech">' + tech + '</ul>' +
+          '<button class="btn btn-outline btn-abrir" type="button" data-url="' + p.url + '">Abrir proyecto</button>' +
+        '</div>' +
+      '</div>';
+
+    detalleContainer.appendChild(section);
+
+    if (i < proyectos.length - 1){
+      var banda = document.createElement("div");
+      banda.className = "banda-transicion";
+      banda.innerHTML = "<span>" + proyectos[i + 1].codigo + "</span>";
+      detalleContainer.appendChild(banda);
+    }
+  });
+
+  detalleContainer.querySelectorAll(".btn-abrir").forEach(function(btn){
+    var originalText = btn.textContent;
+    btn.addEventListener("click", function(){
+      var url = btn.getAttribute("data-url");
+      btn.textContent = "Abriendo...";
+      window.setTimeout(function(){
+        window.open(url, "_blank", "noopener");
+        btn.textContent = originalText;
+      }, 320);
+    });
+  });
+
+  /* ==========================================================
+     INDICADOR LATERAL + BARRA DE ESTADO (IntersectionObserver)
+     ========================================================== */
+  var indicator = document.getElementById("indicator");
+  var statusbarLabel = document.getElementById("statusbarLabel");
+  var trackSections = Array.prototype.slice.call(document.querySelectorAll(".track-section"));
+
+  trackSections.forEach(function(section, i){
+    var dot = document.createElement("button");
+    dot.className = "indicator-dot";
+    dot.type = "button";
+    dot.setAttribute("aria-label", "Ir a " + (section.getAttribute("data-label") || "sección"));
+    dot.addEventListener("click", function(){
+      section.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    });
+    indicator.appendChild(dot);
+    if (i < trackSections.length - 1){
+      var line = document.createElement("div");
+      line.className = "indicator-line";
+      indicator.appendChild(line);
+    }
+  });
+
+  var dots = Array.prototype.slice.call(indicator.querySelectorAll(".indicator-dot"));
+
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting){
+        var idx = trackSections.indexOf(entry.target);
+        dots.forEach(function(d, i){ d.classList.toggle("active", i === idx); });
+        var label = entry.target.getAttribute("data-label");
+        if (label) statusbarLabel.textContent = label;
+      }
+    });
+  }, { root: null, threshold: 0, rootMargin: "-45% 0px -45% 0px" });
+
+  trackSections.forEach(function(section){ observer.observe(section); });
+
+  /* ==========================================================
+     SECUENCIA DE CARGA
+     ========================================================== */
+  var loader = document.getElementById("loader");
+  var loaderStatus = document.getElementById("loaderStatus");
+  var brandLogo = document.getElementById("brandLogo");
+  var topbar = document.getElementById("topbar");
+  var statusbar = document.getElementById("statusbar");
+  var indicatorNav = document.getElementById("indicator");
+  var themeToggleBtn = document.getElementById("themeToggle");
+  var body = document.body;
+
+  var mensajes = ["Inicializando...", "Preparando interfaz...", "Cargando proyectos...", "Listo."];
+
+  function finishLoading(){
+    body.classList.remove("locked");
+    topbar.classList.add("visible");
+    statusbar.classList.add("visible");
+    indicatorNav.classList.add("visible");
+    themeToggleBtn.classList.add("visible");
+    loader.classList.add("hide");
+    dots[0] && dots[0].classList.add("active");
+  }
+
+  if (reduceMotion){
+    finishLoading();
+    brandLogo.classList.add("docked");
+    loader.style.display = "none";
+  } else {
+    var step = 0;
+    var msgInterval = window.setInterval(function(){
+      step++;
+      if (step < mensajes.length){
+        loaderStatus.textContent = mensajes[step];
+      }
+    }, 400);
+
+    window.setTimeout(function(){
+      window.clearInterval(msgInterval);
+      brandLogo.classList.add("docked");
+      finishLoading();
+    }, 1600);
+
+    window.setTimeout(function(){
+      loader.style.display = "none";
+    }, 1600 + 700);
+  }
+
+})();
+</script>
+</body>
+</html>

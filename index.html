@@ -2,868 +2,688 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#050505">
-<meta name="description" content="Acceso a contactos de emergencia.">
-<title>1909</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23050505'/%3E%3Ctext x='32' y='40' font-family='monospace' font-size='20' fill='white' text-anchor='middle'%3E19%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Criptografía · A1Z27 · César · Vigenère</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueUltraLight_3.otf") format("opentype");
-        font-weight: 100;
-        font-style: normal;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueUltraLightItalic_2.otf") format("opentype");
-        font-weight: 100;
-        font-style: italic;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueThin_3.otf") format("opentype");
-        font-weight: 200;
-        font-style: normal;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueThinItalic_2.otf") format("opentype");
-        font-weight: 200;
-        font-style: italic;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueLight_4.otf") format("opentype");
-        font-weight: 300;
-        font-style: normal;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueLightItalic_2.otf") format("opentype");
-        font-weight: 300;
-        font-style: italic;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueRoman_C.otf") format("opentype");
-        font-weight: 400;
-        font-style: normal;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueItalic_5.ttf") format("truetype");
-        font-weight: 400;
-        font-style: italic;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueMedium_7.otf") format("opentype");
-        font-weight: 500;
-        font-style: normal;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueMediumItalic_2.otf") format("opentype");
-        font-weight: 500;
-        font-style: italic;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueBold_6.otf") format("opentype");
-        font-weight: 700;
-        font-style: normal;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueBoldItalic_2.otf") format("opentype");
-        font-weight: 700;
-        font-style: italic;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueHeavy_2.otf") format("opentype");
-        font-weight: 800;
-        font-style: normal;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueHeavyItalic_2.otf") format("opentype");
-        font-weight: 800;
-        font-style: italic;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueBlack_2.otf") format("opentype");
-        font-weight: 900;
-        font-style: normal;
-    }
-    @font-face {
-        font-family: "Helvetica Neue";
-        src: url("fonts/HelveticaNeueBlackItalic_2.otf") format("opentype");
-        font-weight: 900;
-        font-style: italic;
-    }
+  :root{
+    --bg:#050505;
+    --card:#0c0c0e;
+    --card-2:#111114;
+    --line:rgba(255,255,255,0.08);
+    --line-2:rgba(255,255,255,0.14);
+    --text:#f2f2f2;
+    --muted:#8f8f96;
+    --muted-2:#5f5f66;
 
-    :root {
-        --bg: #050505;
-        --bg-raised: #131313;
-        --bg-core: #0a0a0a;
-        --line: rgba(255,255,255,0.10);
-        --line-strong: rgba(255,255,255,0.20);
-        --text: #ffffff;
-        --muted: #9a9a9a;
-        --muted-dim: #565656;
-        --accent: #ffffff;
-        --accent-dim: rgba(255,255,255,0.10);
-        --accent-line: rgba(255,255,255,0.30);
-        --ease: cubic-bezier(0.22, 1, 0.36, 1);
-        --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+    --violet:#a78bfa;
+    --violet-dim:rgba(167,139,250,0.12);
+    --emerald:#34d399;
+    --emerald-dim:rgba(52,211,153,0.12);
+    --amber:#fbbf7a;
+    --amber-dim:rgba(251,191,122,0.12);
 
-    * { box-sizing: border-box; }
+    --ease:cubic-bezier(0.32,0.72,0,1);
+  }
 
-    html { font-size: clamp(14px, 1.6vw, 17px); }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk', -apple-system, 'Segoe UI', sans-serif;
+    min-height:100dvh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:-0.02em;}
+  p{margin:0;}
+  button{font-family:inherit; cursor:pointer;}
+  textarea, input{font-family:inherit;}
 
-    @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after {
-            animation-duration: 0.001ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.001ms !important;
-        }
-    }
+  /* ---------- Ambient background ---------- */
+  #bgGlow{
+    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  }
+  #bgGlow::before, #bgGlow::after{
+    content:''; position:absolute; border-radius:50%;
+    filter:blur(90px); opacity:0.16;
+  }
+  #bgGlow::before{
+    width:60vw; height:60vw; top:-20vw; left:-15vw;
+    background:radial-gradient(circle, var(--violet), transparent 70%);
+    animation:drift1 26s ease-in-out infinite alternate;
+  }
+  #bgGlow::after{
+    width:55vw; height:55vw; bottom:-20vw; right:-15vw;
+    background:radial-gradient(circle, var(--emerald), transparent 70%);
+    animation:drift2 30s ease-in-out infinite alternate;
+  }
+  @keyframes drift1{ from{transform:translate(0,0);} to{transform:translate(6vw,8vw);} }
+  @keyframes drift2{ from{transform:translate(0,0);} to{transform:translate(-6vw,-6vw);} }
 
-    body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family: "Helvetica Neue", "Helvetica", Arial, sans-serif;
-        font-weight: 400;
-        min-height: 100dvh;
-        position: relative;
-        overflow-x: hidden;
-        -webkit-font-smoothing: antialiased;
-    }
+  #grain{
+    position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0.035; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
 
-    main {
-        position: relative;
-        z-index: 2;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100dvh;
-        padding: clamp(24px, 6vh, 64px) clamp(18px, 5vw, 40px);
-    }
+  /* ---------- Layout ---------- */
+  #app{position:relative; z-index:2; max-width:480px; margin:0 auto; min-height:100dvh;}
 
-    .wrap { width: 100%; max-width: 460px; margin: auto; }
+  .screen{
+    display:none;
+    min-height:100dvh;
+    padding:calc(28px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));
+    flex-direction:column;
+  }
+  .screen.active{ display:flex; animation:screenIn .55s var(--ease) both; }
+  @keyframes screenIn{
+    from{opacity:0; transform:translateY(14px);}
+    to{opacity:1; transform:translateY(0);}
+  }
 
-    /* -------- LOGIN -------- */
-    #login {
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        animation: fade-up 900ms var(--ease) both;
-    }
+  /* ---------- Home ---------- */
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:999px;
+    background:var(--card); border:1px solid var(--line);
+    font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted);
+    width:max-content;
+  }
+  .eyebrow span.dot{width:5px;height:5px;border-radius:50%;background:var(--emerald); box-shadow:0 0 6px var(--emerald);}
 
-    @keyframes fade-up {
-        from { opacity: 0; transform: translateY(18px); filter: blur(6px); }
-        to   { opacity: 1; transform: translateY(0); filter: blur(0); }
-    }
+  #home h1{ font-size:34px; font-weight:600; margin-top:18px; line-height:1.08;}
+  #home .subtitle{ margin-top:12px; color:var(--muted); font-size:14.5px; line-height:1.55; max-width:38ch;}
 
-    h1.wordmark {
-        font-family: "Helvetica Neue", "Helvetica", Arial, sans-serif;
-        font-size: 0.6rem;
-        font-weight: 400;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: var(--text);
-        margin: 0;
-        line-height: 1;
-        width: auto;
-        max-width: none;
-        white-space: nowrap;
-        overflow: visible;
-    }
+  .cards{ margin-top:32px; display:flex; flex-direction:column; gap:14px;}
 
-    .field {
-        margin-top: clamp(34px, 6vh, 48px);
-        width: 100%;
-        max-width: 280px;
-        cursor: default;
-    }
-    .field label {
-        display: block;
-        font-size: 0.6rem;
-        font-weight: 500;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: var(--muted-dim);
-        margin-bottom: 10px;
-        text-align: left;
-    }
+  .cipher-card{
+    position:relative;
+    padding:2px;
+    border-radius:22px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid var(--line);
+    text-align:left;
+    opacity:0; transform:translateY(16px);
+    animation:cardIn .7s var(--ease) forwards;
+  }
+  .cipher-card:nth-child(1){animation-delay:.05s;}
+  .cipher-card:nth-child(2){animation-delay:.15s;}
+  .cipher-card:nth-child(3){animation-delay:.25s;}
+  @keyframes cardIn{ to{opacity:1; transform:translateY(0);} }
 
-    .input-shell {
-        background: var(--bg-raised);
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 4px;
-        transition: border-color 320ms var(--ease), box-shadow 320ms var(--ease);
-    }
-    .input-shell:focus-within {
-        border-color: var(--accent-line);
-        box-shadow: 0 0 0 4px var(--accent-dim);
-    }
+  .cipher-card .inner{
+    background:var(--card);
+    border-radius:20px;
+    padding:20px;
+    display:flex; align-items:center; gap:16px;
+    transition:transform .45s var(--ease), background .3s var(--ease);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,0.04);
+  }
+  .cipher-card:active .inner{ transform:scale(0.98); }
 
-    input#pass {
-        width: 100%;
-        background: var(--bg-core);
-        border: none;
-        border-radius: 12px;
-        padding: 15px 16px;
-        font-size: 1.15rem;
-        color: var(--text);
-        text-align: center;
-        letter-spacing: 0.5em;
-        font-family: "Helvetica Neue", "Helvetica", Arial, sans-serif;
-        font-weight: 600;
-        font-variant-numeric: tabular-nums;
-    }
-    input#pass:focus { outline: none; }
-    input#pass::placeholder {
-        color: var(--muted-dim);
-        letter-spacing: normal;
-        font-size: 0.85rem;
-    }
+  .cc-icon{
+    width:46px; height:46px; min-width:46px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--line-2);
+  }
+  .cc-icon svg{width:20px; height:20px;}
 
-    .error-msg {
-        color: var(--text);
-        font-size: 0.68rem;
-        letter-spacing: 0.08em;
-        margin-top: 12px;
-        min-height: 1em;
-        opacity: 0;
-    }
-    .error-msg.show { animation: shake-in 480ms var(--ease); opacity: 1; }
-    @keyframes shake-in {
-        0%   { transform: translateX(0); opacity: 0; }
-        20%  { transform: translateX(-6px); opacity: 1; }
-        40%  { transform: translateX(5px); }
-        60%  { transform: translateX(-4px); }
-        80%  { transform: translateX(2px); }
-        100% { transform: translateX(0); }
-    }
+  .cc-body{flex:1; min-width:0;}
+  .cc-body h3{font-size:16.5px; font-weight:600; margin-bottom:4px;}
+  .cc-body p{font-size:12.5px; color:var(--muted); line-height:1.5;}
 
-    button.enter {
-        margin-top: clamp(18px, 3vh, 26px);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 34px;
-        background: var(--text);
-        border: 1px solid var(--text);
-        border-radius: 999px;
-        color: var(--bg);
-        font-size: 0.78rem;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        font-family: inherit;
-        font-weight: 700;
-        cursor: pointer;
-        transition: transform 200ms var(--ease-spring), opacity 300ms var(--ease);
-    }
-    button.enter:hover { opacity: 0.85; }
-    button.enter:active { transform: scale(0.97); }
+  .cc-arrow{
+    width:30px; height:30px; min-width:30px; border-radius:50%;
+    background:rgba(255,255,255,0.04);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .4s var(--ease), background .3s var(--ease);
+  }
+  .cipher-card:active .cc-arrow{ transform:translateX(2px); background:rgba(255,255,255,0.08); }
+  .cc-arrow svg{width:14px;height:14px;}
 
-    /* -------- NUMEROS -------- */
-    #numeros {
-        display: none;
-        width: 100%;
-        cursor: pointer;
-        animation: fade-up 700ms var(--ease) both;
-    }
+  .a1z27-icon{background:var(--violet-dim); color:var(--violet);}
+  .cesar-icon{background:var(--emerald-dim); color:var(--emerald);}
+  .vig-icon{background:var(--amber-dim); color:var(--amber);}
 
-    .screen-out {
-        animation: screen-fade-out 320ms var(--ease) forwards !important;
-        pointer-events: none;
-    }
-    @keyframes screen-fade-out {
-        from { opacity: 1; transform: translateY(0); filter: blur(0); }
-        to   { opacity: 0; transform: translateY(-14px); filter: blur(4px); }
-    }
+  .home-foot{ margin-top:auto; padding-top:36px; color:var(--muted-2); font-size:11px; text-align:center; letter-spacing:0.04em;}
 
-    .top {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        margin-bottom: clamp(18px, 4vh, 30px);
-        cursor: default;
-    }
-    .top .back {
-        font-size: 0.6rem;
-        font-weight: 300;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--muted-dim);
-    }
+  /* ---------- Cipher screen shared ---------- */
+  .top-row{ display:flex; align-items:center; gap:14px; }
+  .back-btn{
+    width:38px; height:38px; border-radius:50%;
+    background:var(--card); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text); flex-shrink:0;
+    transition:transform .35s var(--ease), background .3s var(--ease);
+  }
+  .back-btn:active{ transform:scale(0.92) translateX(-1px); background:var(--card-2); }
+  .back-btn svg{width:16px;height:16px;}
 
-    h2.title {
-        font-family: "Helvetica Neue", "Helvetica", Arial, sans-serif;
-        font-size: 2.1rem;
-        font-weight: 800;
-        letter-spacing: -0.01em;
-        margin: 0 0 6px;
-        cursor: default;
-    }
-    p.desc {
-        color: var(--muted);
-        font-size: 0.78rem;
-        font-weight: 300;
-        margin: 0 0 clamp(20px, 4vh, 34px);
-        cursor: default;
-        line-height: 1.6;
-    }
+  .screen-title{font-size:20px; font-weight:600;}
+  .screen-tag{font-size:10.5px; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; margin-top:1px;}
 
-    .lista { display: flex; flex-direction: column; gap: 8px; cursor: default; }
+  .desc-card{
+    margin-top:22px; padding:16px 18px; border-radius:16px;
+    background:var(--card); border:1px solid var(--line);
+    font-size:13px; line-height:1.6; color:var(--muted);
+  }
+  .desc-card b{color:var(--text); font-weight:600;}
 
-    .contacto {
-        --d: 0ms;
-        opacity: 0;
-        animation: item-in 620ms var(--ease) both;
-        animation-delay: var(--d);
-        background: var(--bg-raised);
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 4px;
-        transition: border-color 260ms var(--ease);
-    }
-    .contacto:hover { border-color: var(--line-strong); }
+  .segmented{
+    margin-top:24px; display:flex; background:var(--card); border:1px solid var(--line);
+    border-radius:14px; padding:4px; gap:4px;
+  }
+  .segmented button{
+    flex:1; border:none; background:transparent; color:var(--muted);
+    padding:11px 0; border-radius:10px; font-size:13.5px; font-weight:600;
+    transition:background .35s var(--ease), color .3s var(--ease);
+  }
+  .segmented button.active{ background:var(--seg-color, var(--violet)); color:#0a0a0a; }
 
-    @keyframes item-in {
-        from { opacity: 0; transform: translateY(14px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
+  .field-label{
+    margin-top:22px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted-2);
+  }
 
-    .contacto .inner {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        background: var(--bg-core);
-        border-radius: 12px;
-        padding: 13px 14px;
-        cursor: pointer;
-        transition: background 260ms var(--ease), transform 160ms var(--ease-spring);
-    }
-    .contacto .inner:active { transform: scale(0.985); }
-    .contacto .inner:hover { background: #ffffff; }
+  .io-shell{
+    margin-top:10px; padding:1.5px; border-radius:18px;
+    background:rgba(255,255,255,0.05); border:1px solid var(--line);
+  }
+  textarea{
+    width:100%; min-height:110px; resize:vertical;
+    background:var(--card); color:var(--text);
+    border:none; border-radius:16.5px; padding:16px;
+    font-size:14.5px; line-height:1.55; outline:none;
+  }
+  textarea::placeholder{color:var(--muted-2);}
+  textarea:focus{ background:var(--card-2); }
 
-    .who { display: flex; flex-direction: column; gap: 3px; text-align: left; min-width: 0; }
-    .who strong {
-        font-size: 0.86rem;
-        font-weight: 700;
-        letter-spacing: 0.01em;
-        transition: color 260ms var(--ease);
-    }
-    .who span {
-        font-size: 0.72rem;
-        color: var(--muted);
-        font-variant-numeric: tabular-nums;
-        letter-spacing: 0.02em;
-        transition: color 260ms var(--ease);
-    }
-    .contacto .inner:hover .who strong { color: #000000; }
-    .contacto .inner:hover .who span { color: #000000; }
+  .output-box{
+    width:100%; min-height:110px;
+    background:var(--card); color:var(--accent-text, var(--violet));
+    border-radius:16.5px; padding:16px;
+    font-family:'JetBrains Mono', monospace; font-size:13.5px; line-height:1.7;
+    word-break:break-word; white-space:pre-wrap;
+  }
+  .output-box.empty{ color:var(--muted-2); font-family:'Space Grotesk', sans-serif; font-size:13.5px;}
 
-    .call-btn {
-        flex-shrink: 0;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        background: var(--accent-dim);
-        display: grid;
-        place-items: center;
-        transition: background 260ms var(--ease), transform 300ms var(--ease-spring);
-    }
-    .contacto .inner:hover .call-btn { background: #000000; transform: rotate(8deg) scale(1.05); }
-    .call-btn svg { stroke: var(--text); transition: stroke 260ms var(--ease); }
-    .contacto .inner:hover .call-btn svg { stroke: #ffffff; }
+  .row-inline{ display:flex; align-items:center; gap:12px; margin-top:10px; }
+  .num-input{
+    width:84px; background:var(--card); border:1px solid var(--line); color:var(--text);
+    border-radius:12px; padding:10px 12px; font-size:14px; text-align:center; outline:none;
+  }
+  .num-input:focus{border-color:var(--line-2);}
+  input[type="range"]{
+    -webkit-appearance:none; flex:1; height:4px; border-radius:2px;
+    background:var(--line-2); outline:none;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+    background:var(--seg-color, var(--emerald)); cursor:pointer; border:3px solid #0a0a0a;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:18px; height:18px; border-radius:50%; border:3px solid #0a0a0a;
+    background:var(--seg-color, var(--emerald)); cursor:pointer;
+  }
 
-    .extra {
-        margin-top: clamp(28px, 5vh, 42px);
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        cursor: default;
-    }
+  .text-input{
+    width:100%; background:var(--card); border:1px solid var(--line); color:var(--text);
+    border-radius:14px; padding:13px 16px; font-size:14.5px; outline:none;
+    letter-spacing:0.02em;
+  }
+  .text-input:focus{border-color:var(--line-2); background:var(--card-2);}
 
-    .pill-link {
-        width: 100%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 9px;
-        padding: 13px 18px;
-        background: var(--bg-raised);
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        color: var(--text);
-        text-decoration: none;
-        font-size: 0.7rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        transition: border-color 280ms var(--ease), background 280ms var(--ease), transform 220ms var(--ease-spring);
-        white-space: nowrap;
-    }
-    .pill-link:hover {
-        border-color: var(--line-strong);
-        background: var(--bg-core);
-        transform: translateY(-1px);
-    }
-    .pill-link:active { transform: scale(0.97); }
-    .pill-link svg { stroke: var(--muted); transition: stroke 280ms var(--ease); flex-shrink: 0; }
-    .pill-link:hover svg { stroke: var(--text); }
+  .actions{ margin-top:20px; display:flex; gap:10px; }
+  .btn{
+    border:none; border-radius:999px; padding:13px 20px; font-size:13.5px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:transform .3s var(--ease), background .3s var(--ease);
+  }
+  .btn:active{ transform:scale(0.97); }
+  .btn-primary{ background:var(--seg-color, var(--violet)); color:#0a0a0a; flex:1; }
+  .btn-ghost{ background:var(--card); border:1px solid var(--line); color:var(--muted); }
+  .btn-icon-wrap{
+    width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,0.15);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .btn-icon-wrap svg{width:11px;height:11px;}
 
-    .pill-link.priority {
-        padding: 20px 18px;
-        font-size: 0.78rem;
-        font-weight: 700;
-        background: var(--text);
-        color: var(--bg);
-        border-color: var(--text);
-    }
-    .pill-link.priority svg { stroke: var(--bg); }
-    .pill-link.priority:hover {
-        background: var(--text);
-        opacity: 0.85;
-        border-color: var(--text);
-    }
-    .pill-link.priority:hover svg { stroke: var(--bg); }
+  .hint{ margin-top:14px; font-size:11.5px; color:var(--muted-2); line-height:1.5; }
+  .toast{
+    position:fixed; left:50%; bottom:28px; transform:translate(-50%, 12px);
+    background:var(--card-2); border:1px solid var(--line-2); color:var(--text);
+    padding:10px 18px; border-radius:999px; font-size:12.5px;
+    opacity:0; pointer-events:none; transition:all .4s var(--ease); z-index:50;
+  }
+  .toast.show{ opacity:1; transform:translate(-50%, 0); }
 
-    footer.note {
-        margin-top: clamp(30px, 5vh, 46px);
-        text-align: center;
-        font-size: 0.6rem;
-        font-weight: 300;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--muted-dim);
-        cursor: default;
-    }
+  /* ---------- Intro modal ---------- */
+  #introOverlay{
+    position:fixed; inset:0; z-index:100;
+    background:rgba(3,3,4,0.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .4s var(--ease);
+    padding:0 14px calc(14px + env(safe-area-inset-bottom));
+  }
+  #introOverlay.show{ opacity:1; pointer-events:auto; }
+  .modal-card{
+    width:100%; max-width:440px; padding:1.5px; border-radius:26px;
+    background:linear-gradient(160deg, rgba(167,139,250,0.35), rgba(52,211,153,0.2));
+    transform:translateY(30px); transition:transform .5s var(--ease);
+  }
+  #introOverlay.show .modal-card{ transform:translateY(0); }
+  .modal-inner{
+    background:#0b0b0d; border-radius:24.5px; padding:26px 24px calc(24px + env(safe-area-inset-bottom));
+  }
+  .modal-inner h2{font-size:19px; font-weight:600; margin-bottom:10px;}
+  .modal-inner p{font-size:13.5px; line-height:1.65; color:var(--muted); margin-bottom:6px;}
+  .modal-list{ margin:16px 0 20px; display:flex; flex-direction:column; gap:8px; }
+  .modal-list div{ display:flex; gap:10px; align-items:flex-start; font-size:12.5px; color:var(--muted); line-height:1.5;}
+  .modal-list .tick{ width:6px;height:6px;border-radius:50%; margin-top:6px; flex-shrink:0;}
+  #introOverlay .btn{width:100%; padding:14px 0; margin-top:4px;}
 
-    @media (max-width: 420px) {
-        .pill-link { width: 100%; }
-    }
-
-    /* -------- MODAL DE BIENVENIDA -------- */
-    .modal-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 50;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-        background: rgba(0,0,0,0.72);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 320ms var(--ease);
-    }
-    .modal-overlay.show {
-        opacity: 1;
-        pointer-events: auto;
-        animation: modal-overlay-in 380ms var(--ease) both;
-    }
-    @keyframes modal-overlay-in {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-    }
-
-    .modal-card {
-        width: 100%;
-        max-width: 380px;
-        background: var(--bg-raised);
-        border: 1px solid var(--line-strong);
-        border-radius: 20px;
-        padding: 28px 26px;
-        text-align: left;
-        transform: translateY(14px) scale(0.97);
-        opacity: 0;
-        transition: transform 380ms var(--ease-spring), opacity 320ms var(--ease);
-    }
-
-    .modal-overlay.show .modal-card {
-        animation: modal-card-in 620ms var(--ease-spring) both;
-        animation-delay: 90ms;
-    }
-    @keyframes modal-card-in {
-        0%   { opacity: 0; transform: translateY(28px) scale(0.92); filter: blur(8px); }
-        60%  { opacity: 1; filter: blur(0); }
-        100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-    }
-
-    .modal-eyebrow {
-        font-size: 0.6rem;
-        font-weight: 500;
-        letter-spacing: 0.1em;
-        text-transform: none;
-        color: var(--muted-dim);
-        margin: 0 0 14px;
-    }
-
-    .modal-card h3 {
-        font-size: 1.15rem;
-        font-weight: 800;
-        letter-spacing: -0.01em;
-        margin: 0 0 14px;
-    }
-
-    .modal-card p {
-        font-size: 0.82rem;
-        font-weight: 300;
-        line-height: 1.65;
-        color: var(--muted);
-        margin: 0 0 14px;
-    }
-
-    .modal-card p:last-of-type { margin-bottom: 22px; }
-
-    .modal-card button {
-        width: 100%;
-        padding: 14px;
-        background: var(--text);
-        border: 1px solid var(--text);
-        border-radius: 999px;
-        color: var(--bg);
-        font-family: inherit;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: opacity 300ms var(--ease), transform 200ms var(--ease-spring);
-    }
-    .modal-card button:hover { opacity: 0.85; }
-    .modal-card button:active { transform: scale(0.97); }
+  @media (min-width:520px){
+    body{ background:radial-gradient(circle at 50% 0%, #0a0a0d, #050505 60%); }
+  }
 </style>
 </head>
 <body>
 
-<main onclick="handleBackgroundClick()">
-    <div class="wrap">
+<div id="bgGlow"></div>
+<div id="grain"></div>
 
-        <!-- PANTALLA DE CONTRASEÑA -->
-        <div id="login" onclick="window.location.href='https://www.instagram.com/dhg1909'">
-
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="Capa_5" data-name="Capa 5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 82.2 25.51">
-  <defs>
-    <style>
-      .cls-1 {
-        fill: #fff;
-      }
-
-      .cls-2 {
-        fill: #050505;
-      }
-    </style>
-  </defs>
-  <rect class="cls-2" width="82.2" height="25.51"/>
-  <g>
-    <rect class="cls-1" y="5.67" width="25.51" height="14.17"/>
-    <rect class="cls-1" x="5.67" width="19.84" height="25.51"/>
-    <circle class="cls-1" cx="5.67" cy="19.84" r="5.67"/>
-    <circle class="cls-1" cx="5.67" cy="5.67" r="5.67"/>
-    <g>
-      <rect class="cls-2" x="19.84" y="14.88" width="2.83" height="4.25"/>
-      <rect class="cls-2" x="20.55" y="14.17" width="2.13" height="5.67"/>
-      <circle class="cls-2" cx="20.55" cy="19.13" r=".71"/>
-      <circle class="cls-2" cx="20.55" cy="14.88" r=".71"/>
-    </g>
-  </g>
-  <g>
-    <rect class="cls-1" x="28.35" y="13.46" width="25.51" height="7.09"/>
-    <g>
-      <rect class="cls-1" x="42.52" y="1.42" width="11.34" height="22.68" transform="translate(96.38 25.51) rotate(180)"/>
-      <rect class="cls-1" x="43.94" y="0" width="9.92" height="25.51" transform="translate(97.8 25.51) rotate(180)"/>
-      <circle class="cls-1" cx="43.94" cy="24.09" r="1.42"/>
-      <circle class="cls-1" cx="43.94" cy="1.42" r="1.42"/>
-    </g>
-    <g>
-      <rect class="cls-1" x="28.35" y="1.42" width="11.34" height="22.68"/>
-      <rect class="cls-1" x="28.35" width="9.92" height="25.51"/>
-      <circle class="cls-1" cx="38.27" cy="24.09" r="1.42"/>
-      <circle class="cls-1" cx="38.27" cy="1.42" r="1.42"/>
-    </g>
-    <g>
-      <rect class="cls-2" x="40.39" y="19.84" width="1.42" height="1.42"/>
-      <rect class="cls-2" x="39.69" y="20.55" width="2.83" height="4.96"/>
-      <g>
-        <circle class="cls-2" cx="40.39" cy="20.55" r=".71"/>
-        <circle class="cls-2" cx="41.81" cy="20.55" r=".71"/>
-      </g>
-    </g>
-    <g>
-      <rect class="cls-2" x="40.39" y="12.76" width="1.42" height="1.42"/>
-      <rect class="cls-2" x="39.69" width="2.83" height="13.46"/>
-      <g>
-        <circle class="cls-2" cx="40.39" cy="13.46" r=".71"/>
-        <circle class="cls-2" cx="41.81" cy="13.46" r=".71"/>
-      </g>
-    </g>
-  </g>
-  <g>
-    <circle class="cls-1" cx="76.54" cy="19.84" r="5.67"/>
-    <circle class="cls-2" cx="74.41" cy="20.55" r="2.13"/>
-    <rect class="cls-1" x="56.69" width="9.92" height="25.51"/>
-    <rect class="cls-2" x="66.61" y="11.34" width="7.8" height="11.34"/>
-    <rect class="cls-2" x="62.36" y="15.59" width="8.5" height="2.83"/>
-    <circle class="cls-2" cx="66.61" cy="18.43" r="4.25"/>
-    <circle class="cls-2" cx="66.61" cy="15.59" r="4.25"/>
-    <circle class="cls-1" cx="66.61" cy="18.43" r="1.42"/>
-    <rect class="cls-1" x="65.2" y="15.59" width="17.01" height="2.83"/>
-    <rect class="cls-1" x="66.61" y="15.59" width="15.59" height="4.25"/>
-    <rect class="cls-1" x="56.69" y="22.68" width="19.84" height="2.83"/>
-    <rect class="cls-1" x="66.61" y="14.17" width="14.17" height="5.67"/>
-    <circle class="cls-1" cx="80.79" cy="15.59" r="1.42"/>
-    <circle class="cls-1" cx="66.61" cy="15.59" r="1.42"/>
-    <circle class="cls-1" cx="80.79" cy="9.92" r="1.42"/>
-    <circle class="cls-1" cx="76.54" cy="5.67" r="5.67"/>
-    <rect class="cls-1" x="56.69" width="19.84" height="11.34"/>
-    <rect class="cls-1" x="56.69" y="8.5" width="24.09" height="2.83"/>
-    <rect class="cls-1" x="56.69" y="5.67" width="25.51" height="4.25"/>
-    <rect class="cls-1" x="75.83" y="14.17" width="4.96" height="6.38"/>
-    <circle class="cls-2" cx="75.83" cy="20.55" r=".71"/>
-  </g>
-</svg>
-            <div class="field" onclick="event.stopPropagation()">
-                <label for="pass"style="text-align: center;">1909</label>
-                <div class="input-shell">
-                    <input type="text" id="pass" placeholder="*  *  *  *  *  *  *  *  *  *  *  *" oninput="maskInput(event)" autocomplete="off" inputmode="numeric" maxlength="12" aria-describedby="err">
-                </div>
-                <p class="error-msg" id="err">Código no válido</p>
-            </div>
-
-            <div onclick="event.stopPropagation()">
-                <button class="enter" onclick="acceder()">Entrar</button>
-            </div>
-        </div>
-
-        <!-- PANTALLA DE NÚMEROS -->
-        <div id="numeros" onclick="regresar()">
-
-            <div class="top">
-                <span class="back">Tocar para salir</span>
-            </div>
-
-            <h2 class="title">Contactos</h2>
-            <p class="desc">Toque un nombre para llamar directamente.</p>
-
-            <div class="lista">
-
-                <div class="contacto" style="--d:0ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522283123524'; regresar();">
-                        <div class="who"><strong>David</strong><span>+52 228 312 3524</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:40ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522281567186'; regresar();">
-                        <div class="who"><strong>Adriana</strong><span>+52 228 156 7186</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:80ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522283611513'; regresar();">
-                        <div class="who"><strong>Mónica</strong><span>+52 228 361 1513</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:120ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522299848615'; regresar();">
-                        <div class="who"><strong>Eduardo</strong><span>+52 229 984 8615</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:160ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522284106817'; regresar();">
-                        <div class="who"><strong>Sergio</strong><span>+52 228 410 6817</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:200ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522281245180'; regresar();">
-                        <div class="who"><strong>Eduardo</strong><span>+52 228 124 5180</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:240ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522282972364'; regresar();">
-                        <div class="who"><strong>Héctor</strong><span>+52 228 297 2364</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:280ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522281476572'; regresar();">
-                        <div class="who"><strong>Óscar</strong><span>+52 228 147 6572</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:320ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522283632102'; regresar();">
-                        <div class="who"><strong>David</strong><span>+52 228 363 2102</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:360ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522281257340'; regresar();">
-                        <div class="who"><strong>Aldo</strong><span>+52 228 125 7340</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:400ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522281781492'; regresar();">
-                        <div class="who"><strong>Betsabe</strong><span>+52 228 178 1492</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-                <div class="contacto" style="--d:440ms">
-                    <div class="inner" onclick="event.stopPropagation(); location.href='tel:+522283412324'; regresar();">
-                        <div class="who"><strong>Gemma</strong><span>+52 228 341 2324</span></div>
-                        <span class="call-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.9.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="extra">
-                <a class="pill-link priority" href="https://www.google.com.mx/maps/dir//19.497249,-96.852978" target="_blank" rel="noopener" onclick="event.stopPropagation(); regresar();">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 10.5 12 4l9 6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5V19a1 1 0 0 0 1 1h4v-5h4v5h4a1 1 0 0 0 1-1V9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Casa
-                </a>
-                <a class="pill-link" href="https://drive.google.com/file/d/1h4k9gthAi7zyb1s84F9UYYbuzjpWoh0P/view?usp=sharing" target="_blank" rel="noopener" onclick="event.stopPropagation(); regresar();">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-                    Archivo 1909
-                </a>
-            </div>
-
-            <footer class="note" style="text-align: justify; text-align-last: center;">Estos datos están destinados únicamente para ser utilizados en caso de una emergencia. Por favor, no comparta, almacene ni haga un uso indebido de esta información. Gracias por respetar la privacidad de los contactos.</footer>
-            <footer class="note">Toque fuera de la lista para bloquear de nuevo.</footer>
-
-        </div>
-
-        <!-- POPUP DE BIENVENIDA -->
-        <div class="modal-overlay" id="welcome-modal" onclick="event.stopPropagation()">
-            <div class="modal-card">
-                <p class="modal-eyebrow">Antes de continuar</p>
-                <h3>Gracias por su ayuda</h3>
-                <p style="text-align: justify;">Esta página reúne los contactos de las personas a quienes sería necesario informar en caso de una emergencia.</p>
-                <p style="text-align: justify;">Si ha llegado hasta aquí, es porque me ha facilitado su teléfono al no poder utilizar el mío.</p>
-                <p style="text-align: justify;">Lamento las molestias que esto pueda ocasionarle y agradezco su disposición para brindarme su ayuda.</p>
-                <button onclick="closeModal()">Entendido</button>
-            </div>
-        </div>
-
+<!-- INTRO MODAL -->
+<div id="introOverlay">
+  <div class="modal-card">
+    <div class="modal-inner">
+      <div class="eyebrow"><span class="dot"></span>BIENVENIDO</div>
+      <h2 style="margin-top:14px;">Tu caja de herramientas de cifrado</h2>
+      <p>Esta página reúne tres métodos clásicos de criptografía para que cifres y descifres texto directamente desde tu teléfono, sin conexión a servidores externos.</p>
+      <div class="modal-list">
+        <div><span class="tick" style="background:var(--violet)"></span> <span><b style="color:var(--text)">A1Z27</b> — convierte letras en números usando el alfabeto español completo.</span></div>
+        <div><span class="tick" style="background:var(--emerald)"></span> <span><b style="color:var(--text)">César</b> — desplaza cada letra con un valor de 1 a 100.</span></div>
+        <div><span class="tick" style="background:var(--amber)"></span> <span><b style="color:var(--text)">Vigenère</b> — usa una palabra clave para un cifrado más avanzado.</span></div>
+      </div>
+      <button class="btn btn-primary" onclick="closeIntro()">Comenzar</button>
     </div>
-</main>
+  </div>
+</div>
+
+<div id="app">
+
+  <!-- HOME -->
+  <section class="screen active" id="home">
+    <div class="eyebrow"><span class="dot"></span>HERRAMIENTA DE CIFRADO</div>
+    <h1>Criptografía clásica</h1>
+    <p class="subtitle">Elige un método para cifrar o descifrar tu mensaje. Todo el cálculo ocurre en tu propio dispositivo.</p>
+
+    <div class="cards">
+      <button class="cipher-card" onclick="showScreen('a1z27')">
+        <div class="inner">
+          <div class="cc-icon a1z27-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17V7l4 10V7"/><path d="M13 17h5l-5-7h5"/></svg>
+          </div>
+          <div class="cc-body">
+            <h3>A1Z27</h3>
+            <p>Cada letra se transforma en su número de posición dentro del alfabeto español (A–Z y Ñ, del 1 al 27).</p>
+          </div>
+          <div class="cc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+      </button>
+
+      <button class="cipher-card" onclick="showScreen('cesar')">
+        <div class="inner">
+          <div class="cc-icon cesar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M14 6l6 6-6 6"/></svg>
+          </div>
+          <div class="cc-body">
+            <h3>César</h3>
+            <p>Desplaza cada letra un número fijo de posiciones en el alfabeto. Admite desplazamientos del 1 al 100.</p>
+          </div>
+          <div class="cc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+      </button>
+
+      <button class="cipher-card" onclick="showScreen('vigenere')">
+        <div class="inner">
+          <div class="cc-icon vig-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="9" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          </div>
+          <div class="cc-body">
+            <h3>Vigenère</h3>
+            <p>Cifrado polialfabético: una palabra clave define un desplazamiento distinto para cada letra del mensaje.</p>
+          </div>
+          <div class="cc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+      </button>
+    </div>
+
+    <div class="home-foot">Todo el procesamiento es local · nada se envía a internet</div>
+  </section>
+
+  <!-- A1Z27 -->
+  <section class="screen" id="a1z27" style="--seg-color:var(--violet); --accent-text:var(--violet);">
+    <div class="top-row">
+      <button class="back-btn" onclick="showScreen('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <div>
+        <div class="screen-title">A1Z27</div>
+        <div class="screen-tag">Letra ↔ número</div>
+      </div>
+    </div>
+
+    <div class="desc-card">
+      <b>¿Cómo funciona?</b> A cada letra del alfabeto español —incluyendo la Ñ— se le asigna un número según su posición: A=1, B=2 … N=14, Ñ=15, O=16 … Z=27. Al cifrar, los números se separan con guiones y las palabras con «/». Al descifrar, se hace el proceso inverso.
+    </div>
+
+    <div class="segmented" id="a1z27-seg">
+      <button class="active" data-mode="cifrar" onclick="setMode('a1z27','cifrar')">Cifrar</button>
+      <button data-mode="descifrar" onclick="setMode('a1z27','descifrar')">Descifrar</button>
+    </div>
+
+    <div class="field-label" id="a1z27-inLabel">Texto a cifrar</div>
+    <div class="io-shell">
+      <textarea id="a1z27-input" placeholder="Escribe tu mensaje aquí…"></textarea>
+    </div>
+
+    <div class="field-label">Resultado</div>
+    <div class="io-shell">
+      <div class="output-box empty" id="a1z27-output">Aparecerá aquí…</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="copyOutput('a1z27')">
+        <span class="btn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span>
+        Copiar resultado
+      </button>
+      <button class="btn btn-ghost" onclick="clearScreen('a1z27')">Limpiar</button>
+    </div>
+    <div class="hint">Ejemplo: HOLA → 8-16-12-1</div>
+  </section>
+
+  <!-- CÉSAR -->
+  <section class="screen" id="cesar" style="--seg-color:var(--emerald); --accent-text:var(--emerald);">
+    <div class="top-row">
+      <button class="back-btn" onclick="showScreen('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <div>
+        <div class="screen-title">César</div>
+        <div class="screen-tag">Desplazamiento 1–100</div>
+      </div>
+    </div>
+
+    <div class="desc-card">
+      <b>¿Cómo funciona?</b> Cada letra se reemplaza por otra que está un número fijo de posiciones más adelante en el alfabeto (el «desplazamiento»). Puedes usar cualquier valor entre 1 y 100; internamente se ajusta al tamaño del alfabeto español de 27 letras.
+    </div>
+
+    <div class="segmented" id="cesar-seg">
+      <button class="active" data-mode="cifrar" onclick="setMode('cesar','cifrar')">Cifrar</button>
+      <button data-mode="descifrar" onclick="setMode('cesar','descifrar')">Descifrar</button>
+    </div>
+
+    <div class="field-label">Desplazamiento</div>
+    <div class="row-inline">
+      <input type="range" id="cesar-range" min="1" max="100" value="3">
+      <input type="number" class="num-input" id="cesar-num" min="1" max="100" value="3">
+    </div>
+
+    <div class="field-label" id="cesar-inLabel">Texto a cifrar</div>
+    <div class="io-shell">
+      <textarea id="cesar-input" placeholder="Escribe tu mensaje aquí…"></textarea>
+    </div>
+
+    <div class="field-label">Resultado</div>
+    <div class="io-shell">
+      <div class="output-box empty" id="cesar-output">Aparecerá aquí…</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="copyOutput('cesar')">
+        <span class="btn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span>
+        Copiar resultado
+      </button>
+      <button class="btn btn-ghost" onclick="clearScreen('cesar')">Limpiar</button>
+    </div>
+    <div class="hint">Ejemplo con desplazamiento 3: HOLA → KRÑD</div>
+  </section>
+
+  <!-- VIGENÈRE -->
+  <section class="screen" id="vigenere" style="--seg-color:var(--amber); --accent-text:var(--amber);">
+    <div class="top-row">
+      <button class="back-btn" onclick="showScreen('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <div>
+        <div class="screen-title">Vigenère</div>
+        <div class="screen-tag">Cifrado con palabra clave</div>
+      </div>
+    </div>
+
+    <div class="desc-card">
+      <b>¿Cómo funciona?</b> Se elige una palabra clave que se repite letra por letra a lo largo del mensaje. Cada letra del clave indica cuántas posiciones se desplaza la letra correspondiente del texto, generando un cifrado mucho más difícil de romper que el de César.
+    </div>
+
+    <div class="segmented" id="vigenere-seg">
+      <button class="active" data-mode="cifrar" onclick="setMode('vigenere','cifrar')">Cifrar</button>
+      <button data-mode="descifrar" onclick="setMode('vigenere','descifrar')">Descifrar</button>
+    </div>
+
+    <div class="field-label">Palabra clave</div>
+    <input class="text-input" id="vigenere-key" placeholder="Ej. LUNA" autocapitalize="characters">
+
+    <div class="field-label" id="vigenere-inLabel">Texto a cifrar</div>
+    <div class="io-shell">
+      <textarea id="vigenere-input" placeholder="Escribe tu mensaje aquí…"></textarea>
+    </div>
+
+    <div class="field-label">Resultado</div>
+    <div class="io-shell">
+      <div class="output-box empty" id="vigenere-output">Aparecerá aquí…</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="copyOutput('vigenere')">
+        <span class="btn-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span>
+        Copiar resultado
+      </button>
+      <button class="btn btn-ghost" onclick="clearScreen('vigenere')">Limpiar</button>
+    </div>
+    <div class="hint">Ejemplo con clave «LUNA»: HOLA → RJXA</div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast">Copiado al portapapeles</div>
 
 <script>
-    let realPass = "";
+  const ALPHABET = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+  const ALEN = ALPHABET.length; // 27
 
-    window.addEventListener("DOMContentLoaded", () => {
-        setTimeout(() => {
-            document.getElementById("welcome-modal").classList.add("show");
-        }, 400);
+  const state = {
+    a1z27:{ mode:'cifrar' },
+    cesar:{ mode:'cifrar' },
+    vigenere:{ mode:'cifrar' }
+  };
+
+  /* ---------- Navegación ---------- */
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    const el = document.getElementById(id);
+    el.classList.add('active');
+    el.scrollTop = 0;
+    window.scrollTo(0,0);
+  }
+
+  /* ---------- Intro modal (solo al entrar) ---------- */
+  window.addEventListener('load', ()=>{
+    setTimeout(()=>{
+      document.getElementById('introOverlay').classList.add('show');
+    }, 350);
+  });
+  function closeIntro(){
+    document.getElementById('introOverlay').classList.remove('show');
+  }
+
+  /* ---------- Modo cifrar/descifrar ---------- */
+  function setMode(screen, mode){
+    state[screen].mode = mode;
+    document.querySelectorAll('#'+screen+'-seg button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.mode === mode);
     });
+    const label = document.getElementById(screen+'-inLabel');
+    if(label) label.textContent = mode === 'cifrar' ? 'Texto a cifrar' : 'Texto a descifrar';
+    process(screen);
+  }
 
-    function maskInput(e) {
-        const input = e.target;
-        const val = input.value;
-
-        if (val.length > realPass.length) {
-            const added = val.slice(realPass.length).replace(/[^0-9]/g, "");
-            realPass = (realPass + added).slice(0, 12);
-        } else {
-            realPass = realPass.slice(0, val.length);
-        }
-
-        input.value = "*".repeat(realPass.length);
-
-        const err = document.getElementById("err");
-        if (err.classList.contains("show")) {
-            err.classList.remove("show");
-        }
+  /* ---------- Cifrados ---------- */
+  function a1z27Process(text, mode){
+    text = text.toUpperCase();
+    if(mode === 'cifrar'){
+      const parts = [];
+      for(const ch of text){
+        if(ch === ' '){ parts.push('/'); continue; }
+        const idx = ALPHABET.indexOf(ch);
+        if(idx !== -1){ parts.push(String(idx+1)); }
+        else if(ch.trim() !== ''){ parts.push(ch); }
+      }
+      return parts.join('-');
+    } else {
+      const tokens = text.split('-').map(t=>t.trim()).filter(t=>t.length);
+      let out = '';
+      for(const t of tokens){
+        if(t === '/'){ out += ' '; }
+        else if(/^\d+$/.test(t)){
+          const n = parseInt(t,10);
+          out += (n>=1 && n<=ALEN) ? ALPHABET[n-1] : '?';
+        } else out += t;
+      }
+      return out;
     }
+  }
 
-    let transitioning = false;
-
-    function handleBackgroundClick() {
-        const numeros = document.getElementById("numeros");
-        if (numeros.style.display === "block") {
-            regresar();
-        }
+  function cesarProcess(text, shift, mode){
+    let n = ((parseInt(shift,10) || 0) % ALEN + ALEN) % ALEN;
+    if(mode === 'descifrar') n = (ALEN - n) % ALEN;
+    let out = '';
+    for(const ch of text){
+      const upper = ch.toUpperCase();
+      const idx = ALPHABET.indexOf(upper);
+      if(idx === -1){ out += ch; continue; }
+      const newCh = ALPHABET[(idx + n) % ALEN];
+      out += (ch === upper) ? newCh : newCh.toLowerCase();
     }
+    return out;
+  }
 
-    function acceder() {
-        if (transitioning) return;
-        if (realPass === "654125875369") {
-            transitioning = true;
-            const login = document.getElementById("login");
-            const numeros = document.getElementById("numeros");
-            login.classList.add("screen-out");
-            setTimeout(() => {
-                login.style.display = "none";
-                login.classList.remove("screen-out");
-                numeros.style.display = "block";
-                transitioning = false;
-            }, 320);
-        } else {
-            const err = document.getElementById("err");
-            err.classList.remove("show");
-            void err.offsetWidth;
-            err.classList.add("show");
-            const shell = document.querySelector(".input-shell");
-            shell.style.animation = "none";
-            void shell.offsetWidth;
-            shell.style.animation = "shake-in 480ms " + getComputedStyle(document.documentElement).getPropertyValue("--ease");
-        }
+  function vigenereProcess(text, keyword, mode){
+    const key = keyword.toUpperCase().split('').filter(c => ALPHABET.includes(c));
+    if(!key.length) return '';
+    let out = '', ki = 0;
+    for(const ch of text){
+      const upper = ch.toUpperCase();
+      const idx = ALPHABET.indexOf(upper);
+      if(idx === -1){ out += ch; continue; }
+      const kIdx = ALPHABET.indexOf(key[ki % key.length]);
+      const newIdx = mode === 'cifrar'
+        ? (idx + kIdx) % ALEN
+        : ((idx - kIdx) % ALEN + ALEN) % ALEN;
+      const newCh = ALPHABET[newIdx];
+      out += (ch === upper) ? newCh : newCh.toLowerCase();
+      ki++;
     }
+    return out;
+  }
 
-    function closeModal() {
-        document.getElementById("welcome-modal").classList.remove("show");
+  /* ---------- Procesamiento por pantalla ---------- */
+  function setOutput(screen, text){
+    const box = document.getElementById(screen+'-output');
+    if(text && text.length){
+      box.textContent = text;
+      box.classList.remove('empty');
+    } else {
+      box.textContent = 'Aparecerá aquí…';
+      box.classList.add('empty');
     }
+  }
 
-    function regresar() {
-        if (transitioning) return;
-        transitioning = true;
-        const login = document.getElementById("login");
-        const numeros = document.getElementById("numeros");
-        numeros.classList.add("screen-out");
-        setTimeout(() => {
-            numeros.style.display = "none";
-            numeros.classList.remove("screen-out");
-            realPass = "";
-            const pass = document.getElementById("pass");
-            if (pass) pass.value = "";
-            login.style.display = "";
-            transitioning = false;
-        }, 320);
+  function process(screen){
+    const mode = state[screen].mode;
+    const input = document.getElementById(screen+'-input').value;
+
+    if(!input){ setOutput(screen, ''); return; }
+
+    let result = '';
+    if(screen === 'a1z27'){
+      result = a1z27Process(input, mode);
+    } else if(screen === 'cesar'){
+      const shift = document.getElementById('cesar-num').value;
+      result = cesarProcess(input, shift, mode);
+    } else if(screen === 'vigenere'){
+      const key = document.getElementById('vigenere-key').value;
+      result = key.trim() ? vigenereProcess(input, key, mode) : '';
+      if(!key.trim()){
+        setOutput(screen, '');
+        const box = document.getElementById('vigenere-output');
+        box.textContent = 'Escribe una palabra clave para continuar…';
+        box.classList.add('empty');
+        return;
+      }
     }
+    setOutput(screen, result);
+  }
+
+  function clearScreen(screen){
+    document.getElementById(screen+'-input').value = '';
+    if(screen === 'vigenere') document.getElementById('vigenere-key').value = '';
+    setOutput(screen, '');
+  }
+
+  function copyOutput(screen){
+    const box = document.getElementById(screen+'-output');
+    if(box.classList.contains('empty')) return;
+    const text = box.textContent;
+    const doToast = ()=>{
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=>t.classList.remove('show'), 1600);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(doToast).catch(()=>fallbackCopy(text, doToast));
+    } else {
+      fallbackCopy(text, doToast);
+    }
+  }
+  function fallbackCopy(text, cb){
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    cb();
+  }
+
+  /* ---------- Listeners ---------- */
+  document.getElementById('a1z27-input').addEventListener('input', ()=>process('a1z27'));
+
+  document.getElementById('cesar-input').addEventListener('input', ()=>process('cesar'));
+  const cesarRange = document.getElementById('cesar-range');
+  const cesarNum = document.getElementById('cesar-num');
+  cesarRange.addEventListener('input', ()=>{ cesarNum.value = cesarRange.value; process('cesar'); });
+  cesarNum.addEventListener('input', ()=>{
+    let v = parseInt(cesarNum.value,10);
+    if(isNaN(v)) v = 1;
+    v = Math.min(100, Math.max(1, v));
+    cesarRange.value = v;
+    process('cesar');
+  });
+
+  document.getElementById('vigenere-input').addEventListener('input', ()=>process('vigenere'));
+  document.getElementById('vigenere-key').addEventListener('input', ()=>process('vigenere'));
 </script>
-
 </body>
 </html>

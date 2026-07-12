@@ -139,29 +139,29 @@ button{ font-family:inherit; }
 .brand-logo{
   position:fixed;
   left:50%; top:50%;
-  width:210px;
-  transform:translate(-50%,-50%) scale(1);
+  width:clamp(190px, 26vw, 280px);
   z-index:10000;
   opacity:0;
-  animation:logoIntro .9s var(--ease-std) .15s both;
-  transition:
-    transform var(--dur-logo) var(--ease-std),
-    top var(--dur-logo) var(--ease-std),
-    width var(--dur-logo) var(--ease-std);
+  transform:translate(-50%,-50%) scale(.78);
+  transition:opacity .85s var(--ease-std), transform .85s var(--ease-std);
 }
-@keyframes logoIntro{
-  from{ opacity:0; transform:translate(-50%,-50%) scale(.8); }
-  to{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+.brand-logo.enter{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
 }
 .brand-logo svg{ display:block; width:100%; height:auto; }
 .brand-logo .logo-negative{ display:none; }
 [data-theme="dark"] .brand-logo .logo-positive{ display:none; }
 [data-theme="dark"] .brand-logo .logo-negative{ display:block; }
 
+/* la regla .docked es más específica que la base + .enter,
+   así que al añadirse toma el control con su propia duración larga */
 .brand-logo.docked{
   top:calc(var(--topbar-h) / 2);
   width:74px;
+  opacity:1;
   transform:translate(-50%,-50%) scale(1);
+  transition:top var(--dur-logo) var(--ease-std), width var(--dur-logo) var(--ease-std), transform var(--dur-logo) var(--ease-std);
 }
 
 /* ============================================================
@@ -195,15 +195,26 @@ button{ font-family:inherit; }
   top:var(--topbar-h); left:0; right:0;
   height:var(--statusbar-h);
   z-index:490;
-  display:flex; align-items:center; justify-content:space-between;
-  gap:16px;
-  padding:0 clamp(16px, 4vw, 40px);
+  display:flex; align-items:stretch;
   background:var(--c-bg-soft);
   border-bottom:1px solid var(--c-border);
   opacity:0;
   transition:opacity .6s var(--ease-std) .1s, background var(--dur-theme) var(--ease-std), border-color var(--dur-theme) var(--ease-std);
 }
 .statusbar.visible{ opacity:1; }
+.statusbar-cell{
+  display:flex;
+  align-items:center;
+}
+.statusbar-cell--label{
+  flex:1;
+  padding:0 clamp(16px, 4vw, 40px);
+  min-width:0;
+}
+.statusbar-cell--toggle{
+  border-left:1px solid var(--c-border);
+  transition:border-color var(--dur-theme) var(--ease-std);
+}
 .statusbar-label{
   font-family:var(--font-mono);
   font-size:.68rem;
@@ -211,6 +222,9 @@ button{ font-family:inherit; }
   text-transform:uppercase;
   color:var(--c-fg-soft);
   transition:opacity var(--dur-text) var(--ease-std);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 /* ============================================================
@@ -252,15 +266,17 @@ button{ font-family:inherit; }
    ============================================================ */
 .theme-toggle{
   flex-shrink:0;
+  height:100%;
+  display:flex;
+  align-items:center;
   font-family:var(--font-mono);
   font-size:.66rem;
   letter-spacing:.12em;
   text-transform:uppercase;
   color:var(--c-fg);
   background:transparent;
-  border:1px solid var(--c-border-strong);
-  border-radius:999px;
-  padding:5px 13px;
+  border:none;
+  padding:0 clamp(16px, 4vw, 28px);
   cursor:pointer;
   transition:background var(--dur-btn) var(--ease-std), color var(--dur-btn) var(--ease-std);
 }
@@ -276,6 +292,7 @@ main{ position:relative; z-index:1; }
 .track-section{
   min-height:100vh;
   padding-top:calc(var(--topbar-h) + var(--statusbar-h));
+  padding-bottom:var(--statusbar-h);
   scroll-snap-align:start;
   display:flex;
   flex-direction:column;
@@ -402,11 +419,13 @@ main{ position:relative; z-index:1; }
   display:flex;
   align-items:center;
   justify-content:center;
+  perspective:1400px;
 }
 .carousel-track{
   position:relative;
   width:100%;
   height:100%;
+  transform-style:preserve-3d;
 }
 .carousel-card{
   position:absolute;
@@ -416,10 +435,14 @@ main{ position:relative; z-index:1; }
   transform:translate(-50%,-50%);
   background:var(--c-bg);
   border:1px solid var(--c-border);
-  transition:transform var(--dur-carousel) var(--ease-std), opacity var(--dur-carousel) var(--ease-std);
+  transition:transform var(--dur-carousel) var(--ease-std), opacity var(--dur-carousel) var(--ease-std), box-shadow var(--dur-carousel) var(--ease-std);
   display:flex; flex-direction:column;
   cursor:pointer;
   overflow:hidden;
+  will-change:transform;
+}
+.carousel-card.is-active{
+  box-shadow:0 18px 44px rgba(0,0,0,.14);
 }
 .carousel-card-preview{
   flex:1;
@@ -626,26 +649,27 @@ main{ position:relative; z-index:1; }
   position:fixed;
   left:0; right:0; bottom:0;
   z-index:470;
+  height:var(--statusbar-h);
   border-top:1px solid var(--c-border);
-  background:var(--c-bg);
-  padding:22px clamp(20px, 5vw, 56px);
+  background:var(--c-bg-soft);
+  padding:0 clamp(16px, 4vw, 40px);
   display:flex; align-items:center; justify-content:center;
   transition:background var(--dur-theme) var(--ease-std), border-color var(--dur-theme) var(--ease-std);
 }
 .contacto-band a{
   font-family:var(--font-mono);
-  font-size:.92rem;
-  letter-spacing:.04em;
+  font-size:.68rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--c-fg-soft);
   text-decoration:none;
-  border-bottom:1px solid var(--c-border-strong);
-  padding-bottom:2px;
-  transition:opacity var(--dur-btn) var(--ease-std);
+  transition:opacity var(--dur-btn) var(--ease-std), color var(--dur-theme) var(--ease-std);
 }
 @media (hover:hover) and (pointer:fine){
   .contacto-band a:hover{ opacity:.55; }
 }
 #contacto{
-  padding-bottom:var(--contactband-h, 82px);
+  padding-bottom:var(--statusbar-h);
 }
 
 /* ============================================================
@@ -829,8 +853,12 @@ main{ position:relative; z-index:1; }
 </header>
 
 <div class="statusbar" id="statusbar">
-  <p class="statusbar-label" id="statusbarLabel">SECCIÓN 01 / PRESENTACIÓN</p>
-  <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Modo oscuro</button>
+  <div class="statusbar-cell statusbar-cell--label">
+    <p class="statusbar-label" id="statusbarLabel">SECCIÓN 01 / PRESENTACIÓN</p>
+  </div>
+  <div class="statusbar-cell statusbar-cell--toggle">
+    <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Modo oscuro</button>
+  </div>
 </div>
 
 <nav class="indicator" id="indicator" aria-label="Progreso de navegación"></nav>
@@ -1008,21 +1036,11 @@ main{ position:relative; z-index:1; }
         '<p class="carousel-card-name">' + p.nombre + '</p>' +
         '<p class="carousel-card-url">' + p.url.replace(/^https?:\/\//, "") + '</p>' +
       '</div>';
-    card.addEventListener("click", function(){
-      if (parseInt(card.getAttribute("data-index"), 10) === activeIndex){
-        goToProject(i);
-      } else {
-        setActive(i);
-      }
-    });
+    card.addEventListener("click", function(){ selectProject(i); });
     card.addEventListener("keydown", function(e){
       if (e.key === "Enter" || e.key === " "){
         e.preventDefault();
-        if (parseInt(card.getAttribute("data-index"), 10) === activeIndex){
-          goToProject(i);
-        } else {
-          setActive(i);
-        }
+        selectProject(i);
       }
     });
     track.appendChild(card);
@@ -1037,14 +1055,16 @@ main{ position:relative; z-index:1; }
       if (diff > n / 2) diff -= n;
       var abs = Math.abs(diff);
       card.classList.toggle("is-active", diff === 0);
+      var rotate = diff * -20;
+      var depth = -abs * 90;
       if (abs > 2){
         card.style.opacity = "0";
         card.style.pointerEvents = "none";
-        card.style.transform = "translate(-50%,-50%) translateX(" + (diff * 260) + "px) scale(0.5)";
+        card.style.transform = "translate(-50%,-50%) translateX(" + (diff * 260) + "px) translateZ(" + depth + "px) rotateY(" + rotate + "deg) scale(0.5)";
       } else {
         card.style.opacity = String(1 - abs * 0.35);
         card.style.pointerEvents = "auto";
-        card.style.transform = "translate(-50%,-50%) translateX(" + (diff * 260) + "px) scale(" + (1 - abs * 0.15) + ")";
+        card.style.transform = "translate(-50%,-50%) translateX(" + (diff * 260) + "px) translateZ(" + depth + "px) rotateY(" + rotate + "deg) scale(" + (1 - abs * 0.15) + ")";
       }
       card.style.zIndex = String(n - abs);
     });
@@ -1054,6 +1074,19 @@ main{ position:relative; z-index:1; }
   function setActive(i){
     activeIndex = ((i % cards.length) + cards.length) % cards.length;
     renderCarousel();
+  }
+
+  /* seleccionar un proyecto: primero lo centra con la animación del
+     carrusel y, apenas termina (o de inmediato si ya estaba centrado),
+     baja suavemente hasta su vista de detalle */
+  function selectProject(i){
+    var wasActive = i === activeIndex;
+    setActive(i);
+    if (wasActive || reduceMotion){
+      goToProject(i);
+    } else {
+      window.setTimeout(function(){ goToProject(i); }, 720);
+    }
   }
 
   document.getElementById("carouselPrev").addEventListener("click", function(){ setActive(activeIndex - 1); });
@@ -1214,9 +1247,17 @@ main{ position:relative; z-index:1; }
 
   if (reduceMotion){
     finishLoading();
-    brandLogo.classList.add("docked");
+    brandLogo.classList.add("enter", "docked");
     loader.style.display = "none";
   } else {
+    // doble rAF para asegurar que el navegador pinte el estado inicial
+    // (opacity 0, escala .78) antes de activar la transición de entrada
+    window.requestAnimationFrame(function(){
+      window.requestAnimationFrame(function(){
+        brandLogo.classList.add("enter");
+      });
+    });
+
     var step = 0;
     var msgInterval = window.setInterval(function(){
       step++;
